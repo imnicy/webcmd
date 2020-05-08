@@ -1,3 +1,5 @@
 Pipfile.lock
 .env
 storage/*
+.idea
+__pycache__

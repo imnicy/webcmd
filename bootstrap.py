@@ -1,17 +1,15 @@
-from flask import Flask, _app_ctx_stack
-from flask_script import Manager
+from flask import Flask
 from setting import configs
 from lib.views import views_blue
 from lib.models import database
-from lib.capsule.app import App
 
 
-def create_manager(environ=None):
+def create_app(environ=None):
     """
     create flask web manager
     from environ
     :param environ: development, production, default
-    :return:
+    :return: Flask
     """
     if environ is None or environ not in configs:
         environ = 'default'
@@ -21,21 +19,21 @@ def create_manager(environ=None):
     config.bootstrap()
 
     # make flask manager
-    fls = Flask(__name__)
-    fls.config.from_object(config)
+    app = Flask(__name__)
+    app.config.from_object(config)
 
     # init database use SQLAlchmy
-    database.init_app(fls)
+    database.init_app(app)
 
-    return Manager(load_blueprints(fls))
+    return load_blueprints(app)
 
 
-def load_blueprints(fls):
+def load_blueprints(app):
     """
     load blueprints
-    :param fls:
-    :return:
+    :param app:
+    :return: Flask
     """
-    fls.register_blueprint(views_blue)
+    app.register_blueprint(views_blue)
 
-    return fls
+    return app

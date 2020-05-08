@@ -7,7 +7,6 @@ verify_ssl = true
 
 [packages]
 python-dotenv = "*"
-flask-script = "*"
 flask-sqlalchemy = "*"
 flask-mysqldb = "*"
 
