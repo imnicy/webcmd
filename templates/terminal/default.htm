@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html ng-app="cmd">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <title>title</title>
+    <link rel="icon" type="image/png" href="/static/assets/images/imnicy.png"/>
+    <link rel="stylesheet" href="/static/assets/css/app.css">
+</head>
+<body>
+
+<div class="site-main-header" style="color:black; transform:scale(0);">
+    <h1>Music, blog, develop tools and make free webpage</h1>
+</div>
+<div ng-view></div>
+<script type="text/javascript">
+    var _RUN_CMD = "";
+    var terminalData = {{ terminal_data|safe }};
+    var appCommands = {{ app_commands|safe }};
+</script>
+
+<script type="text/javascript" src="/static/assets/javascript/vendors/vendors.min.js"></script>
+<script type="text/javascript" src="/static/assets/javascript/terminal.module.js"></script>
+<script type="text/javascript" src="/static/assets/javascript/app.js"></script>
+</body>
+</html>

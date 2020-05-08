@@ -1,0 +1,15 @@
+<div class="holder">
+    <div class="iframeHolder"></div>
+    <div class="container">
+        <div class="terminal-output"></div>
+        <div ng-hide="term.prompting" class="terminal-input-holder">
+            <div class="pre-query" ng-mouseover="term.mergePreQuery($event)">$ {{ '{{term.preQuery}}' }}</div>
+            <input class="terminal-input" type="text" autocomplete="off" eb-caret="caretPosition" ng-model="queryHistory[queryIndex]" />
+        </div>
+        <div ng-show="term.prompting" class="terminal-input-holder">
+            <div class="pre-prompt">{{ '{{term.prompting}}' }}:</div>
+            <input class="prompt-input prompt-input-sml"  ng-hide="term.promptingPassword" eb-caret="promptCaretPosition" type="text" autocomplete="off" ng-model="term.promptAnswer" ng-keypress="($event.which === 13)?answerPrompt():0" ng-keydown="onKeyDown($event)" ng-keyup="onKeyUp($event)" ng-keypress="onKeyPress($event)" />
+            <input class="prompt-input prompt-input-sml" ng-show="term.promptingPassword" eb-caret="promptCaretPosition" type="password" autocomplete="off" ng-model="term.promptAnswer" ng-keypress="($event.which === 13)?answerPrompt():0" ng-keydown="onKeyDown($event)" ng-keyup="onKeyUp($event)" ng-keypress="onKeyPress($event)" />
+        </div>
+    </div>
+</div>

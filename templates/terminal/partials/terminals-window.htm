@@ -1,0 +1,23 @@
+<div id="terminals-window" ng-init="newTerminal()">
+    <div id="curtain" class="curtain"></div>
+    <div id="bg" class="bg"></div>
+    <div id="rest">
+        <div class="iframeHolderCloseBtn" ng-click="closeActiveIframe()">×</div>
+        <ul id="tabs" class="noselect">
+            <li ng-repeat="terminal in terminals" ng-click="switchTerminal(terminal)" ng-class="{'active':isTerminalActive(terminal)}">
+                {{ "{{getTerminalsActiveAppName(terminal)}}" }} <a href="javascript:;" class='close_tab_btn' ng-click="closeTerminal(terminal); $event.stopPropagation();">×</a>
+            </li>
+            <li ng-click="newTerminal()">
+                + Add
+            </li>
+            <li class='pull-right mini-player-indicator' ng-show="isPlayingOtherTerminal() || isScWidgetFogged" ng-click="goToFoggedScWidget()" ng-mouseover="isHoveredScFogBtn = true" ng-mouseout="isHoveredScFogBtn = false">
+                <img src="/static/assets/images/play.gif" ng-hide="isHoveredScFogBtn">
+                <img src="/static/assets/images/play_o.gif" ng-show="isHoveredScFogBtn">
+                <span ng-show="isHoveredScFogBtn"><span id="currentGenre"></span> <span id="currentTrack"></span></span>
+            </li>
+        </ul>
+        <div id="terminal-main-holder">
+            <terminal ng-repeat="terminal in terminals" ng-attr-id="term-id-{{ '{{terminal}}' }}" tid="{{ '{{terminal}}' }}" ng-show="isTerminalActive(terminal)" ng-class="{'activeTerminal':isTerminalActive(terminal)}"></terminal>
+        </div>
+    </div>
+</div>
