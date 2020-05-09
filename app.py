@@ -1,3 +1,5 @@
+# -*- coding=utf-8 -*-
+
 from bootstrap import create_app
 
 app = create_app(environ='default')

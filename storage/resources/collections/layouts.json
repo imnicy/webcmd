@@ -1,0 +1,63 @@
+[
+  {
+    "name": "galactic",
+    "image": "/static/assets/images/layouts/galactic.jpg",
+    "credits": "http://bit.ly/184q4xw"
+  },
+  {
+    "name": "nowhere",
+    "image": "/static/assets/images/layouts/nowhere.jpg",
+    "credits": "Abdulla Rashim"
+  },
+  {
+    "name": "tile",
+    "image": "/static/assets/images/layouts/tile.jpg",
+    "credits": "ccc"
+  },
+  {
+    "name": "jetsky",
+    "image": "/static/assets/images/layouts/jetsky.jpg",
+    "credits": "http://unsplash.com"
+  },
+  {
+    "name": "awake",
+    "image": "/static/assets/images/layouts/awake.jpg",
+    "credits": "http://bit.ly/16sfUtI"
+  },
+  {
+    "name": "mountain",
+    "image": "/static/assets/images/layouts/mountain.jpg",
+    "credits": "http://www.bhmpics.com/view-black_mountain-wide.html"
+  },
+  {
+    "name": "snowie",
+    "image": "/static/assets/images/layouts/snowie.jpg",
+    "credits": "http://unrestrictedstock.com"
+  },
+  {
+    "name": "space_night",
+    "image": "/static/assets/images/layouts/spacenight.gif",
+    "credits": "https://dribbble.com/shots/1438974-Space-45-Night",
+    "color_scheme": "dark"
+  },
+  {
+    "name": "forest",
+    "image": "/static/assets/images/layouts/forest.jpg",
+    "credits": "null"
+  },
+  {
+    "name": "poly",
+    "image": "/static/assets/images/layouts/poly.jpg",
+    "credits": "JJ Ying"
+  },
+  {
+    "name": "nature",
+    "image": "/static/assets/images/layouts/nature.jpg",
+    "credits": "null"
+  },
+  {
+    "name": "windowz",
+    "image": "/static/assets/images/layouts/windowz.jpg",
+    "credits": "null"
+  }
+]

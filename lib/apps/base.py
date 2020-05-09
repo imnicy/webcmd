@@ -1,4 +1,5 @@
 import json
+from ..capsule.exceptions import CommandNotFound
 
 
 class Base:
@@ -28,7 +29,7 @@ class Base:
     def get_command(self, name, enable=True):
         commands = self.get_enable_commands() if enable else self.get_commands()
         for found in commands:
-            if found.NAME == name or name in found.__ALIASES__:
+            if found.NAME == name or name in found.ALIASES:
                 return found
 
         return False
@@ -38,17 +39,18 @@ class Base:
             self.COMMANDS = self.commands()
             self.ENABLE_COMMANDS = self.COMMANDS
 
-            if self.AUTHOR is not None:
+            if self.HIDDEN:
+                active_commands = []
                 for command in self.ENABLE_COMMANDS:
                     if getattr(command, 'NAME') in self.ACTIVE_COMMANDS:
-                        self.ENABLE_COMMANDS.append(command)
+                        active_commands.append(command)
+                self.ENABLE_COMMANDS = active_commands
 
-            filtered_commands = []
+            certified_commands = []
             for command in self.ENABLE_COMMANDS:
                 if getattr(command, 'AUTH', 0) == 0:
-                    filtered_commands.append(command)
-
-            self.ENABLE_COMMANDS = filtered_commands
+                    certified_commands.append(command)
+            self.ENABLE_COMMANDS = certified_commands
 
         return self.COMMANDS
 
@@ -58,12 +60,14 @@ class Base:
 
         return self.ENABLE_COMMANDS
 
-    def run_command(self, name):
-        self.set_active_commands([name])
-        command = self.get_command(name)
-        if command:
-            return command.run()
-        raise ModuleNotFoundError('command %s not found.' % name)
+    def run_command(self, name=None):
+        if name is not None:
+            self.set_active_commands([name])
+            command = self.get_command(name)
+
+            if command:
+                return command.run()
+        raise CommandNotFound('command %s not found.' % name)
 
     def __load_command_scripts(self):
         scripts = []
@@ -86,19 +90,19 @@ class Base:
                                 valid_parameters.append(parameter)
 
                         parameter_in_callback = ','.join(valid_parameters)
-                    data = 'function(%s){%s}' % (parameter_in_callback, item)
+                    parsed_data = 'function(%s){%s}' % (parameter_in_callback, item)
                 elif isinstance(item, str):
-                    data = "'%s'" % item
+                    parsed_data = "'%s'" % item
                 elif isinstance(item, list) or isinstance(item, dict):
-                    data = json.dumps(item).replace('"', '\'')
+                    parsed_data = json.dumps(item, ensure_ascii=False).replace('"', '\'')
                 elif isinstance(item, bool):
-                    data = 'true' if item else 'false'
+                    parsed_data = 'true' if item else 'false'
                 elif isinstance(item, int):
-                    data = item
+                    parsed_data = item
                 else:
                     continue
 
-                script += "%s:%s," % (name, data)
+                script += "%s:%s," % (name, parsed_data)
             script += '}'
             scripts.append(script)
 
@@ -107,15 +111,19 @@ class Base:
     def __build_script(self):
         if self.SCRIPT is not None:
             return self.SCRIPT
+
         sst = ''
         aliases = '[\''+','.join(self.ALIASES)+'\']'
         show_help_bool = 'true' if self.SHOW_ON_HELP else 'false'
-        caching = 'false' if self.HIDDEN else 'false'
+        caching = 'false' if self.HIDDEN else 'true'
 
         sst += 'caching:%s,name:\'%s\',author:\'%s\',info:\'%s\',aliases:%s,show_on_help:%s,' \
                'controller:function(){%s},commands:%s' % \
                (caching, self.NAME, self.AUTHOR, self.INFO, aliases, show_help_bool, self.controller(),
                 self.__load_command_scripts())
+
+        script = '$scope.apps.%s={%s}' % (self.NAME, sst)
+        return script
 
     def script(self):
         return self.__build_script()
@@ -123,8 +131,9 @@ class Base:
     def __commands_to_array(self):
         to_array = []
         commands = self.get_enable_commands()
+
         for command in commands:
-            to_array.append(dict(command))
+            to_array.append(command.to_array())
         return to_array
 
     def __get_commands_structure(self, commands):
@@ -144,6 +153,7 @@ class Base:
 
     def to_array(self):
         commands = self.__commands_to_array()
+
         return {
             'aliases': self.ALIASES,
             'author': self.AUTHOR,
@@ -151,7 +161,7 @@ class Base:
             'info': self.INFO,
             'show_on_help': self.SHOW_ON_HELP,
             'commands': commands,
-            'commands_array': '',
+            'commands_array': [command.get('name', 'None') for command in commands],
             'commands_structure': self.__get_commands_structure(commands),
             'script': self.script()
         }

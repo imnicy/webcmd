@@ -1738,22 +1738,13 @@ terminal.directive('terminal', function() {
 
             $scope.term.getHeader = function() {
 
-                if ($(window).width() < 500) {
-                    var logo = [
-                        $scope.ui.dye("  _                 _           _ ","white"),
-                        $scope.ui.dye(" | |_ ___ _ _ _ __ (_)_ _  __ _| |" + $scope.ui.dye('ᴮᴱᵀᴬ','yellow'),"white"),
-                        $scope.ui.dye(" |  _/ -_) '_| '  \\| | ' \\/ _` | |","white"),
-                        $scope.ui.dye("  \\__\\___|_| |_|_|_|_|_||_\\__,_|_|","white")
+                var logo = [
+                        $scope.ui.dye(" _ _ _        __  _   _  __  ","white"),
+                        $scope.ui.dye("| | | |_||   / _|| \\_/ ||  \\ ","white"),
+                        $scope.ui.dye("| V V /o\\o\\ ( (_ | \\_/ || o )","white"),
+                        $scope.ui.dye(" \\_n_/\\(|_() \\__||_| |_||__/ ","white"),
+                        $scope.ui.dye("                             ","white")
                     ];
-                }
-                else {
-                    var logo = [
-                        $scope.ui.dye(" .---. .----..----. .-.   .-..-..-. .-.  .--.  .-.   ","white"),
-                        $scope.ui.dye("{_   _}| {_  | {}  }|  `.'  || ||  `| | / {} \\ | |   " + $scope.ui.dye('ᴮᴱᵀᴬ','yellow'),"white"),
-                        $scope.ui.dye("  | |  | {__ | .-. \\| |\\ /| || || |\\  |/  /\\  \\| `--.","white"),
-                        $scope.ui.dye("  `-'  `----'`-' `-'`-' ` `-'`-'`-' `-'`-'  `-'`----'","white")
-                    ];
-                }
 
                 var msg = [
                     $scope.ui.divider('-'),

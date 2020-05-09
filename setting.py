@@ -8,10 +8,10 @@ class Config:
     SECRET_KEY = '8XYn85BSfbyeS716i45ev93Nm9tj4j46DceYZtpFccrFnFMqvQWBXf4SMJy5DS3A'
     TERMINAL_CONFIGS = {
         'apps': [
-            'lib.apps.help.Help'
+            'lib.apps.help.Help',
+            'lib.apps.cmd.Cmd',
+            'lib.apps.system.System'
         ],
-
-        'command': {},
 
         'auth': {}
     }

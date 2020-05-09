@@ -1,5 +1,6 @@
 from .base import Base
 from ..capsule.command import Command
+from ..capsule.resource import Resource
 
 
 class Help(Base):
@@ -10,22 +11,20 @@ class Help(Base):
     ALIASES = ['wtf', 'info', 'information']
 
     def commands(self):
-        def index_called():
-            return '' \
-                   '$scope.apps.help.header(false, function() {' \
-                   '    $scope.apps.help.list(false)' \
-                   '})'
-
-        def pro_called():
-            return '' \
-                   '$scope.apps.help.header(true, function() {' \
-                   '    $scope.apps.help.list(true)' \
-                   '})'
-
         return [
-            Command.build('index').help('This is the help module of imnicy.com OS.').init(index_called),
-            Command.build('pro').help('Advanced commands for pro users.').aliases(['all']).init(pro_called)
+            Command.build('index').help('This is the help module of imnicy.com OS.').init(
+                '$scope.apps.help.header(false, function() {$scope.apps.help.list(false)})'
+            ),
+
+            Command.build('pro').help('Advanced commands for pro users.').aliases(['all']).init(
+                '$scope.apps.help.header(true, function() {$scope.apps.help.list(true)})'
+            ),
+
+            Command.build('app').help('Get help for an app.').parameters(['app_name', 'flag']).example('help app cmd')
+            .init(
+                'var pro = flag === \'pro\' ? true : false; $scope.apps.help.list(pro, app_name)'
+            )
         ]
 
     def controller(self):
-        pass
+        return Resource.load('scripts/apps/help.js')

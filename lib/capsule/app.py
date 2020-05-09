@@ -1,6 +1,7 @@
 from flask import current_app
 from .query import Query
 from importlib import import_module
+from ..capsule.exceptions import AppNotFound, CommandNotFound, InvalidArgument
 
 
 class App:
@@ -8,7 +9,7 @@ class App:
     REGISTERED = False
 
     def __init__(self):
-        self.APPS = []
+        self.APPS = {}
         self.HIDDEN = {}
         self.APPS_ALIASES = {}
 
@@ -22,7 +23,7 @@ class App:
         for app in apps:
             cls, mod = app.rsplit('.', maxsplit=1)
             imported = import_module(cls)
-            instance = getattr(imported, mod)
+            instance = getattr(imported, mod)()
 
             if getattr(instance, 'NAME', None) is None:
                 continue
@@ -30,7 +31,7 @@ class App:
             if getattr(instance, 'HIDDEN', False):
                 self.HIDDEN[getattr(instance, 'NAME')] = instance
             else:
-                self.APPS.append(instance())
+                self.APPS[getattr(instance, 'NAME')] = instance
 
             self.__set_apps_aliases(getattr(instance, 'NAME'), getattr(instance, 'ALIASES'))
 
@@ -51,7 +52,7 @@ class App:
     def __apps_to_array(self):
         apps = self.apps()
         data = []
-        for app in apps:
+        for app_name, app in apps.items():
             data.append(app.to_array())
         return data
 
@@ -63,15 +64,16 @@ class App:
         if name is not None and found_app is not None:
             if self.__is_hidden(found_app):
                 return self.HIDDEN.get(found_app)
-            return self.APPS[found_app]
+            return self.APPS.get(found_app)
+
         found_app = self.__get_from_command_or_app(name)
         if from_command and found_app:
             return found_app
-        raise ModuleNotFoundError('app %s not found' % name)
+        raise AppNotFound('app %s not found' % name)
 
     def __get_from_command_or_app(self, name):
         apps = self.apps()
-        for app in apps:
+        for app_name, app in apps.items():
             enable_commands = app.get_enable_commands()
             for command in enable_commands:
                 if getattr(command, 'NAME', None) == name or name in getattr(command, 'ALIASES'):
@@ -86,6 +88,9 @@ class App:
         }
 
     def run(self, queries):
+        if not queries or queries is None:
+            raise InvalidArgument('Invalid arguments: query field is required.')
+
         query = Query.f(queries)
         app = self.get(query.app(), True)
         command = query.command() if getattr(app, 'NAME') == query.app() else query.app()
@@ -93,7 +98,7 @@ class App:
         app.set_active_commands([command])
 
         if not app.get_command(command):
-            raise ModuleNotFoundError('app founded, bud command %s not found.' % query.command())
+            raise CommandNotFound('app founded, bud command %s not found.' % query.command())
 
         return {
             'status': True,
@@ -101,3 +106,6 @@ class App:
             'script': app.script(),
             'queries': queries
         }
+
+
+application = App()

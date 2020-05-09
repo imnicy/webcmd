@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template
-from ..capsule.app import App
+from ..capsule.app import application as cmd_app_capsule
+from ..capsule.resource import Resource
 import json
 
 
@@ -8,17 +9,12 @@ terminal_blue = Blueprint('terminal', __name__)
 
 class Terminal:
 
-    NEWS = ["Github: <a href='https://github.com/imnicy'>https://github.com/imnicy</a>"]
-    TIPS = ["0.9.2 - Fixed some bugs for smoother use."]
-
     @staticmethod
     def get_app_commands():
         explain = {}
-        application = App()
-        application.register()
-        apps = application.apps()
+        apps = cmd_app_capsule.apps()
 
-        for app in apps:
+        for app_name, app in apps.items():
             command_explain = {}
             commands = app.get_enable_commands()
             for command in commands:
@@ -45,15 +41,15 @@ class Terminal:
             },
             'token': ''
         }
-        return json.dumps(data)
+        return json.dumps(data, ensure_ascii=False)
 
     @staticmethod
     def __get_news():
-        return Terminal.NEWS
+        return json.loads(Resource.load('collections/news.json'))
 
     @staticmethod
     def __get_tips():
-        return Terminal.TIPS
+        return json.loads(Resource.load('collections/tips.json'))
 
 
 @terminal_blue.route('/')

@@ -1,3 +1,6 @@
+from importlib import import_module
+
+
 class Command:
 
     PRO = False
@@ -43,7 +46,7 @@ class Command:
         return self
 
     def parameters(self, parameters):
-        self.PARAMETERS = parameters
+        self.PARAMETERS = parameters if isinstance(parameters, list) else [parameters]
         return self
 
     def aliases(self, aliases):
@@ -59,7 +62,10 @@ class Command:
         return self
 
     def init(self, called):
-        self.INIT = called()
+        if isinstance(called, str):
+            self.INIT = called
+        elif hasattr(called, '__call__'):
+            self.INIT = called()
         if not isinstance(self.INIT, str):
             self.INIT = None
         return self
@@ -73,9 +79,13 @@ class Command:
         return self
 
     def run(self):
-        if self.CALLABLE is not None:
-            if hasattr(self.CALLABLE, '__call__'):
-                return self.CALLABLE(self)
+        the_callable = self.CALLABLE
+        if the_callable is not None and isinstance(the_callable, str):
+            cls, cmd = the_callable.rsplit('.', maxsplit=1)
+            module = import_module(cls)
+            command = getattr(module, cmd)
+            if command is not None and hasattr(command, '__call__'):
+                return command(self)
         return None
 
     def allow_cache(self):

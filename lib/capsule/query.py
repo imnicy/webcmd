@@ -12,8 +12,8 @@ class Query:
         return Query(queries)
 
     def parse(self, queries):
-        joined = ' '.join(queries)
-        valid = list(map(lambda q: q.trim(), joined))
+        joined = [] if queries is None else queries.strip().split(' ')
+        valid = list(map(lambda q: q.strip(), joined))
 
         if len(valid) == 0:
             return False
