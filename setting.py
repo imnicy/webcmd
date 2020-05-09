@@ -2,10 +2,20 @@ import os
 from dotenv import find_dotenv, load_dotenv
 
 
+def env(name, default=None):
+    """
+    get env config value from environ
+    :param name: string
+    :param default: string
+    :return: str
+    """
+    return os.getenv(name, default)
+
+
 class Config:
     ENV_LOADED = False
 
-    SECRET_KEY = '8XYn85BSfbyeS716i45ev93Nm9tj4j46DceYZtpFccrFnFMqvQWBXf4SMJy5DS3A'
+    SECRET_KEY = env('SECRET_KEY', 'secret key')
     TERMINAL_CONFIGS = {
         'apps': [
             'lib.apps.help.Help',
@@ -17,42 +27,29 @@ class Config:
     }
 
     @staticmethod
-    def env(name, default):
-        """
-        get env config value from environ
-        :param name: string
-        :param default: string
-        :return: str
-        """
-        if not Config.ENV_LOADED:
-            load_dotenv(find_dotenv('.env'))
-            Config.ENV_LOADED = True
-        return os.getenv(name, default)
-
-    @staticmethod
     def bootstrap():
-        pass
+        load_dotenv(find_dotenv('.env'))
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'mysql://%s:%s@%s:%s/%s' % (
-        Config.env('DEV_DB_USER', 'user'),
-        Config.env('DEV_DB_PASSWORD', 'password'),
-        Config.env('DEV_DB_HOST', 'localhost'),
-        Config.env('DEV_DB_PORT', 3306),
-        Config.env('DEV_DB_NAME', 'database')
+        env('DEV_DB_USER', 'user'),
+        env('DEV_DB_PASSWORD', 'password'),
+        env('DEV_DB_HOST', 'localhost'),
+        env('DEV_DB_PORT', 3306),
+        env('DEV_DB_NAME', 'database')
     ),
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'mysql://%s:%s@%s:%s/%s' % (
-        Config.env('PRO_DB_USER', 'user'),
-        Config.env('PRO_DB_PASSWORD', 'password'),
-        Config.env('PRO_DB_HOST', 'localhost'),
-        Config.env('PRO_DB_PORT', 3306),
-        Config.env('PRO_DB_NAME', 'database')
+        env('PRO_DB_USER', 'user'),
+        env('PRO_DB_PASSWORD', 'password'),
+        env('PRO_DB_HOST', 'localhost'),
+        env('PRO_DB_PORT', 3306),
+        env('PRO_DB_NAME', 'database')
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
