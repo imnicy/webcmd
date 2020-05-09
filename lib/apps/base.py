@@ -27,15 +27,16 @@ class Base:
         return self
 
     def get_command(self, name, enable=True):
-        commands = self.get_enable_commands() if enable else self.get_commands()
+        commands = self.get_enable_commands() if enable else self.get_commands(True)
+
         for found in commands:
             if found.NAME == name or name in found.ALIASES:
                 return found
 
         return False
 
-    def get_commands(self):
-        if len(self.COMMANDS) == 0:
+    def get_commands(self, refresh=False):
+        if len(self.COMMANDS) == 0 or refresh:
             self.COMMANDS = self.commands()
             self.ENABLE_COMMANDS = self.COMMANDS
 
@@ -52,7 +53,7 @@ class Base:
                     certified_commands.append(command)
             self.ENABLE_COMMANDS = certified_commands
 
-        return self.COMMANDS
+        return self.ENABLE_COMMANDS
 
     def get_enable_commands(self):
         if len(self.ENABLE_COMMANDS) == 0:

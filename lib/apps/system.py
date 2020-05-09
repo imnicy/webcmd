@@ -9,6 +9,7 @@ class System(Base):
     INFO = 'Hidden system operating instruction group'
     SHOW_ON_HELP = False
     ALIASES = ['sys']
+    HIDDEN = True
 
     def commands(self):
         return [

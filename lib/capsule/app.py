@@ -96,8 +96,9 @@ class App:
         command = query.command() if getattr(app, 'NAME') == query.app() else query.app()
 
         app.set_active_commands([command])
+        enable = False if getattr(app, 'HIDDEN') else True
 
-        if not app.get_command(command):
+        if not app.get_command(command, enable):
             raise CommandNotFound('app founded, bud command %s not found.' % query.command())
 
         return {
