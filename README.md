@@ -9,7 +9,6 @@
 ```shell script
 $ git clone git@github.com:imnicy/webcmd.git
 $ pip install pipenv
-$ pipenv --python python3
 $ pipenv install
 ```
 
