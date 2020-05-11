@@ -40,7 +40,7 @@ app.header = function(pro,callback) {
 
 app.list = function(pro,only_app) {
 
-    var rpt = 26;
+    var rpt = 50;
 
     $scope.http.get('', {cache: true}).then(function(response){
 
@@ -53,7 +53,7 @@ app.list = function(pro,only_app) {
 
         response.data.apps.forEach(function(v,i){
 
-            if(only_app && only_app != v.name) {
+            if(only_app && only_app !== v.name) {
                 return;
             }
 
@@ -71,10 +71,17 @@ app.list = function(pro,only_app) {
                 }
 
                 if(pro_filter) {
-                    var param = (nv.parameter=='')?'':' <i>{'+nv.parameter+'}</i>';
+                    var param = '';
+                    arguments = nv.arguments;
+                    if (arguments.length !== 0) {
+                        for (let ai in arguments) {
+                            param += ' <i>{'+arguments[ai]+'}</i>';
+                        }
+                    }
+                    var opt = (nv.options.length !== 0)? ' --['+nv.options.join('|')+']':'';
                     var example = (nv.example===undefined||nv.example===null)?'':'<i>'+nv.example+'</i>';
-                    var nvname = (nv.name!='index') ? ' ' + nv.name : '';
-                    var cmd_tag = '<cmd>'+v.name + nvname + param + '</cmd>';
+                    var nvname = (nv.name!=='index') ? ' ' + nv.name : '';
+                    var cmd_tag = '<cmd>'+v.name + nvname + param + '</cmd>' + $scope.ui.dye(opt, 'tomato');
                     var cc = $(cmd_tag).text().length;
                     var dots = $scope.ui.dye($scope.helpers.repeater('.', rpt - cc ), 'darkgray');
                     add.push(cmd_tag + (dots) + nv.help + ' ' + $scope.ui.dye(example, 'darkgray'));

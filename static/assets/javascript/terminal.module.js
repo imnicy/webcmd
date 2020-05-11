@@ -1286,7 +1286,6 @@ terminal.directive('terminal', function() {
                                 /* Load app script */
                                 eval(data.script);
 
-
                                 $timeout(function(){
                                     if(data.app !== undefined && data.app !== null) {
 

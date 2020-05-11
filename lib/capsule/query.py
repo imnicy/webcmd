@@ -1,10 +1,11 @@
 class Query:
 
-    APP = None
-    COMMAND = None
+    app = None
+    command = None
 
     def __init__(self, queries):
-        self.PARAMETERS = []
+        self.arguments = []
+        self.options = []
         self.parse(queries)
 
     @staticmethod
@@ -18,17 +19,17 @@ class Query:
         if len(valid) == 0:
             return False
 
-        self.APP = valid[0]
-        self.COMMAND = 'index' if len(valid) < 2 else valid[1]
-        self.PARAMETERS = valid[2:]
+        self.app = valid[0]
+        self.command = 'index' if len(valid) < 2 else valid[1]
+        self.arguments = valid[2:]
 
         return True
 
-    def app(self):
-        return self.APP
+    def get_app(self):
+        return self.app
 
-    def command(self):
-        return self.COMMAND
+    def get_command(self):
+        return self.command
 
-    def parameters(self):
-        return self.PARAMETERS
+    def get_arguments(self):
+        return self.arguments

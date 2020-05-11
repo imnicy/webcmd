@@ -3,116 +3,118 @@ from importlib import import_module
 
 class Command:
 
-    PRO = False
-    INIT = None
-    HELP = None
-    EXAMPLE = None
+    arguments = []
+    options = []
 
-    WITH_INIT = False
-    CALLABLE = None
-    NO_CACHING = False
-    FORCE_CACHING = False
+    _with_init = False
 
-    ALIASES = []
-    PARAMETERS = []
+    def __init__(
+            self,
+            name,
+            auth_level=0,
+            caching=False,
+            help_string=None,
+            arguments=None,
+            options=None,
+            aliases=None,
+            pro=False,
+            example=None,
+            init=None,
+            command=None
+    ):
+        self.name = name
+        self.help_string = help_string
+        self.auth_level = auth_level
 
-    AUTH = 0
+        self.__parse_arguments_and_options(arguments=arguments, options=options)
+        self.__set_aliases(aliases)
 
-    def __init__(self, name):
-        self.NAME = name
+        self.caching = caching
+        self.pro = pro
+        self.example = example
 
-    @staticmethod
-    def build(name):
-        return Command(name)
+        self.__bind_command(command)
+        self.__init_script(init)
 
-    def need_auth(self, level):
-        self.AUTH = level
-        return self
+    def __init_script(self, script):
+        if isinstance(script, str):
+            self.init = script
+        elif hasattr(script, '__call__'):
+            self.init = script()
+        if not isinstance(self.init, str):
+            self.init = None
 
-    def no_caching(self):
-        self.NO_CACHING = True
-        return self
+    def __bind_command(self, command):
+        if isinstance(command, str):
+            if command in locals().keys() or command in dir():
+                self.callable = command
+            elif '.' in command:
+                cls, cmd = command.rsplit('.', maxsplit=1)
+                module = import_module(cls)
+                self.callable = getattr(module, cmd)
+        elif hasattr(command, '__call__'):
+            self.callable = command
 
-    def force_caching(self):
-        self.FORCE_CACHING = True
-        return self
+    def __parse_arguments_and_options(self, arguments, options):
+        self.arguments = []
+        self.options = []
+        if isinstance(arguments, list):
+            for argument in arguments:
+                self.__argument_parser(argument)
+        if isinstance(options, list):
+            for option in options:
+                self.__option_parser(option)
 
-    def name(self, name):
-        self.NAME = name
-        return self
+    def __argument_parser(self, argument):
+        if isinstance(argument, str) and ' ' not in argument:
+            self.arguments.append(argument)
 
-    def help(self, message):
-        self.HELP = message
-        return self
+    def __option_parser(self, option):
+        if isinstance(option, str) and ' ' not in option:
+            self.options.append(option)
 
-    def parameters(self, parameters):
-        self.PARAMETERS = parameters if isinstance(parameters, list) else [parameters]
-        return self
+    def __set_aliases(self, aliases):
+        if isinstance(aliases, str) or isinstance(aliases, list):
+            self.aliases = aliases if isinstance(aliases, list) else [aliases]
+        else:
+            self.aliases = []
 
-    def aliases(self, aliases):
-        self.ALIASES = aliases
-        return self
-
-    def pro(self, status):
-        self.PRO = status
-        return self
-
-    def example(self, example):
-        self.EXAMPLE = example
-        return self
-
-    def init(self, called):
-        if isinstance(called, str):
-            self.INIT = called
-        elif hasattr(called, '__call__'):
-            self.INIT = called()
-        if not isinstance(self.INIT, str):
-            self.INIT = None
-        return self
-
-    def with_init(self, status):
-        self.WITH_INIT = status
-        return self
-
-    def command(self, called):
-        self.CALLABLE = called
-        return self
+    def with_init(self, status=True):
+        self._with_init = status
 
     def run(self):
-        the_callable = self.CALLABLE
-        if the_callable is not None and isinstance(the_callable, str):
-            cls, cmd = the_callable.rsplit('.', maxsplit=1)
-            module = import_module(cls)
-            command = getattr(module, cmd)
-            if command is not None and hasattr(command, '__call__'):
-                return command(self)
+        the_callable = self.callable
+        if the_callable is not None and hasattr(the_callable, '__call__'):
+            return the_callable(self)
         return None
 
     def allow_cache(self):
-        if self.FORCE_CACHING:
+        if len(self.arguments) or len(self.options):
+            return False
+        if self.caching:
             return True
-        if self.NO_CACHING:
-            return False
-        if self.PARAMETERS:
-            return False
         return True
 
     def to_array(self):
-        parameters = self.PARAMETERS if self.PARAMETERS is not None else ['']
+        arguments = self.arguments if self.arguments is not None else []
+        options = self.options if self.options is not None else []
+
         data = {
-            'pro': self.PRO,
-            'help': self.HELP,
-            'name': self.NAME,
-            'auth': self.AUTH,
-            'example': self.EXAMPLE,
-            'aliases': self.ALIASES,
-            'parameter': ','.join(parameters),
-            'parameters': parameters,
+            'pro': self.pro,
+            'help': self.help_string,
+            'name': self.name,
+            'auth': self.auth_level,
+            'example': self.example,
+            'aliases': self.aliases,
+            'options': options,
+            'arguments': arguments,
             'caching': self.allow_cache()
         }
-        if self.WITH_INIT is not None:
-            data['init'] = self.INIT
+
+        if self._with_init:
+            data['init'] = self.init
+
         return data
 
     def to_string(self):
-        return self.NAME + '__' + '_'.join(self.PARAMETERS)
+        return 'Command <%s>' % self.name

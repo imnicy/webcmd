@@ -12,19 +12,20 @@ class Terminal:
     @staticmethod
     def get_app_commands():
         explain = {}
-        apps = cmd_app_capsule.apps()
+        apps = cmd_app_capsule.get_apps()
 
         for app_name, app in apps.items():
             command_explain = {}
             commands = app.get_enable_commands()
             for command in commands:
-                command_explain[getattr(command, 'NAME')] = {
-                    'parameters': getattr(command, 'PARAMETERS'),
-                    'aliases': getattr(command, 'ALIASES')
+                command_explain[getattr(command, 'name')] = {
+                    'arguments': getattr(command, 'arguments'),
+                    'options': getattr(command, 'options'),
+                    'aliases': getattr(command, 'aliases')
                 }
 
-            explain[getattr(app, 'NAME')] = {
-                'aliases': getattr(app, 'ALIASES'),
+            explain[getattr(app, 'name')] = {
+                'aliases': getattr(app, 'aliases'),
                 'commands': command_explain
             }
 

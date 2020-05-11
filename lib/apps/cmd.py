@@ -4,41 +4,33 @@ from ..capsule.resource import Resource
 
 
 class Cmd(Base):
-    NAME = 'cmd'
-    INFO = 'Etc module of cmd platform'
-    SHOW_ON_HELP = True
-    ALIASES = ['etc']
+    name = 'cmd'
+    info = 'Etc module of cmd platform'
+
+    show_on_help = True
+    aliases = ['etc']
 
     def commands(self):
         return [
-            Command.build('index').help('cmd is toolkit of imnicy.com').force_caching().init(
-                '$scope.ui.addWarning(\'You can enter cmd <cmd>help app cmd<cmd> for more help.\');'
-            ),
+            Command(name='index', help_string='cmd is toolkit of imnicy.com', caching=True,
+                    init='$scope.ui.addWarning(\'You can enter cmd <cmd>help app cmd<cmd> for more help.\');'),
 
-            Command.build('layouts').help('Show all available layouts').force_caching().example('cmd layouts').init(
-                '$scope.apps.cmd.layouts();'
-            ).command('lib.commands.collection.layouts'),
+            Command(name='layouts', help_string='Show all available layouts', caching=True, example='cmd layouts',
+                    init='$scope.apps.cmd.layouts();', command='lib.commands.collection.layouts'),
 
-            Command.build('layout').help('Set layout from available layouts.').example('cmd layout default')
-            .parameters(['name']).pro(True).init(
-                '$scope.apps.cmd.layout(name);'
-            ),
+            Command(name='layout', help_string='Set layout from available layouts.', example='cmd layout default',
+                    arguments=['name'], pro=True, init='$scope.apps.cmd.layout(name);'),
 
-            Command.build('about').help('hello web cmd!').pro(True).example('cmd about').init(
-                '$scope.apps.cmd.about();'
-            ),
+            Command(name='about', help_string='hello web cmd!', pro=True, example='cmd about',
+                    init='$scope.apps.cmd.about();'),
 
-            Command.build('search').help('Search in imnicy.com').parameters(['query']).example(
-                'cmd search Paris Hilton | cmd s -a Paris Hilton'
-            ).init(
-                '$scope.apps.cmd.search(query);'
-            ),
+            Command(name='search', help_string='Search in imnicy.com', arguments=['query'],
+                    example='cmd search Paris Hilton | cmd s -a Paris Hilton',
+                    init='$scope.apps.cmd.search(query);'),
 
-            Command.build('go').parameters('url').help('Go to url').example(
-                'cmd go google.com | cmd go https://example.com'
-            ).init(
-                '$scope.apps.cmd.go(url);'
-            )
+            Command(name='go', arguments=['url', 'text'], help_string='Go to url',
+                    example='cmd go google.com | cmd go https://example.com',
+                    init='alert(text); alert(url);')
         ]
 
     def controller(self):
