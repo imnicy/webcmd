@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, current_app
 from ..capsule.app import application as cmd_app_capsule
 from ..capsule.resource import Resource
 import json

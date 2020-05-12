@@ -74,7 +74,8 @@ class Command:
     def run(self):
         the_callable = self.callable
         if the_callable is not None and hasattr(the_callable, '__call__'):
-            return the_callable(self)
+            contents = the_callable(self)
+            return contents if isinstance(contents, str) else ''
         return None
 
     def allow_cache(self):

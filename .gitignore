@@ -1,6 +1,11 @@
+#pipenv
 Pipfile.lock
+#dotenv
 .env
 storage/uploads/*
 storage/logs/*
+#pycharm
 .idea
+# python
+*/*/__pycache__
 __pycache__

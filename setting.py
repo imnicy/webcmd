@@ -16,6 +16,7 @@ class Config:
     ENV_LOADED = False
 
     SECRET_KEY = env('SECRET_KEY', 'secret key')
+
     TERMINAL_CONFIGS = {
         'apps': [
             'lib.apps.help.Help',
@@ -23,7 +24,13 @@ class Config:
             'lib.apps.system.System'
         ],
 
-        'auth': {}
+        'auth': []
+    }
+
+    LOGGER = {
+        'version': 1,
+        'level': 'DEBUG',
+        'handlers': ['wsgi']
     }
 
     @staticmethod

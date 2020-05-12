@@ -1,7 +1,9 @@
+import os
 from flask import Flask
 from setting import configs
+from providers.db import database
+from providers.logger import register as logger_register
 from lib.views import views_blue
-from lib.models import database
 from lib.capsule.app import application as cmd_app_capsule
 
 
@@ -18,6 +20,9 @@ def create_app(environ=None):
     # environ bootstrap
     config = configs.get(environ)
     config.bootstrap()
+
+    # register app logger
+    logger_register(os.path.dirname(__file__), config.LOGGER)
 
     # make flask manager
     app = Flask(__name__)

@@ -1,4 +1,5 @@
 import json, re
+from jsmin import jsmin
 from ..capsule.exceptions import CommandNotFound
 
 
@@ -119,7 +120,7 @@ class Base:
                (caching, self.name, self.author, self.info, aliases, show_help_bool, self.controller(),
                 self.__load_command_scripts())
 
-        script = '$scope.apps.%s={%s}' % (self.name, sst)
+        script = jsmin('$scope.apps.%s={%s}' % (self.name, sst))
         return script
 
     def get_script(self):
