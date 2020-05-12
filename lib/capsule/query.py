@@ -5,7 +5,6 @@ class Query:
 
     def __init__(self, queries):
         self.arguments = []
-        self.options = []
         self.parse(queries)
 
     @staticmethod

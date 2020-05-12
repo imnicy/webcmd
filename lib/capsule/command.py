@@ -4,8 +4,6 @@ from importlib import import_module
 class Command:
 
     arguments = []
-    options = []
-
     _with_init = False
 
     def __init__(
@@ -15,7 +13,6 @@ class Command:
             caching=False,
             help_string=None,
             arguments=None,
-            options=None,
             aliases=None,
             pro=False,
             example=None,
@@ -26,7 +23,7 @@ class Command:
         self.help_string = help_string
         self.auth_level = auth_level
 
-        self.__parse_arguments_and_options(arguments=arguments, options=options)
+        self.__parse_arguments(arguments)
         self.__set_aliases(aliases)
 
         self.caching = caching
@@ -55,23 +52,15 @@ class Command:
         elif hasattr(command, '__call__'):
             self.callable = command
 
-    def __parse_arguments_and_options(self, arguments, options):
+    def __parse_arguments(self, arguments):
         self.arguments = []
-        self.options = []
         if isinstance(arguments, list):
             for argument in arguments:
                 self.__argument_parser(argument)
-        if isinstance(options, list):
-            for option in options:
-                self.__option_parser(option)
 
     def __argument_parser(self, argument):
         if isinstance(argument, str) and ' ' not in argument:
             self.arguments.append(argument)
-
-    def __option_parser(self, option):
-        if isinstance(option, str) and ' ' not in option:
-            self.options.append(option)
 
     def __set_aliases(self, aliases):
         if isinstance(aliases, str) or isinstance(aliases, list):
@@ -89,7 +78,7 @@ class Command:
         return None
 
     def allow_cache(self):
-        if len(self.arguments) or len(self.options):
+        if len(self.arguments):
             return False
         if self.caching:
             return True
@@ -97,7 +86,6 @@ class Command:
 
     def to_array(self):
         arguments = self.arguments if self.arguments is not None else []
-        options = self.options if self.options is not None else []
 
         data = {
             'pro': self.pro,
@@ -106,7 +94,6 @@ class Command:
             'auth': self.auth_level,
             'example': self.example,
             'aliases': self.aliases,
-            'options': options,
             'arguments': arguments,
             'caching': self.allow_cache()
         }

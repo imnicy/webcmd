@@ -118,7 +118,7 @@ app.signin = function () {
 app.resend = function (email) {
 
     $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('📩RESEND CONFIRMATION'), $scope.ui.br()], undefined, function () {
-        if (email === undefined || email == 'resend') {
+        if (email === undefined || email === 'resend') {
             email = '';
             $scope.ui.prompt('Email address', false, false, function (resp) {
                 email = resp;
@@ -168,7 +168,7 @@ app.resend = function (email) {
 
 app.show = function (username) {
 
-    if (username === undefined || username == 'show') {
+    if (username === undefined || username === 'show') {
         username = '';
         $scope.ui.prompt('Enter an username to show profile (type \'me\' for your profile)', false, false, function (resp) {
             username = resp;
@@ -186,7 +186,7 @@ app.show = function (username) {
 
                         $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('👤PROFILE:' + username || ''), $scope.ui.br()], undefined, function () {
                             angular.forEach(data.user_data.current_user, function (value, key) {
-                                if (value && value !== null && value !== undefined) {
+                                if (value) {
                                     $scope.ui.addInfo(key.toUpperCase().replace('_', ' ') + ': ' + value, undefined, '<span style=\'color:white\'>-></span>');
                                 }
                             });
@@ -219,7 +219,7 @@ app.show = function (username) {
 
                     $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('👤PROFILE:' + username || ''), $scope.ui.br()], undefined, function () {
                         angular.forEach(data.user_data.current_user, function (value, key) {
-                            if (value && value !== null && value !== undefined) {
+                            if (value) {
                                 $scope.ui.addInfo(key.toUpperCase().replace('_', ' ') + ': ' + value, undefined, '<span style=\'color:white\'>-></span>');
                             }
                         });
@@ -246,7 +246,7 @@ app.recover = function (email_or_username) {
 
     $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('📩RECOVER ACCOUNT'), $scope.ui.br()], undefined, function () {
 
-        if (email_or_username === undefined || email_or_username == 'retrieve' || email_or_username == 'recover' || email_or_username == 'forget') {
+        if (email_or_username === undefined || email_or_username === 'retrieve' || email_or_username === 'recover' || email_or_username === 'forget') {
 
             $scope.ui.prompt('Email or username', false, false, function (resp) {
                 email_or_username = resp;
@@ -368,64 +368,45 @@ app.signup = function () {
 
                                         } else if (data.errorText !== undefined) {
 
-                                            $scope.ui.add($scope.ui.divider('*'), undefined, function () {
+                                            $scope.ui.add($scope.ui.divider('*'), function () {
                                                 $scope.ui.addError('We have problems: ' + data.errorText);
                                             });
 
                                         } else {
-                                            $scope.ui.add($scope.ui.divider('*'), undefined, function () {
+                                            $scope.ui.add($scope.ui.divider('*'), function () {
                                                 $scope.ui.addError('Authentication failed, please check your email/username and password.');
                                                 $scope.ui.addWarning('If you forget your username/email or password, please use <cmd>user recover</cmd> command.');
                                             });
                                         }
                                     });
                                 }, 400);
-
                             }, 400);
-
-
                         });
-
                     });
-
-
                 });
-
-
             });
-
         });
-
     });
-
 };
 
 app._update = function () {
 
     // --
-
     $scope.ui.addInfo('Running client-side validations, please wait..');
-
     has_signup_errors = app._validateUpdate();
 
     if (has_signup_errors.length > 0) {
-
         $scope.ui.addError('We have problems: ' + has_signup_errors.join(' & '));
-
         return false;
     }
 
-
     $scope.ui.addInfo('Setting up XMLHttpRequest..');
-
 
     $timeout(function () {
         $scope.ui.addInfo('Running server-side validations, please wait..');
-
         $timeout(function () {
 
             var p = $scope.tempUserData;
-
             data_to_send = {};
 
             if (p.email) {
@@ -446,9 +427,9 @@ app._update = function () {
             }
 
             if (p.gender) {
-                if ($.trim(p.gender.toLowerCase()) == 'm' || $.trim(p.gender.toLowerCase()) == 'male' || $.trim(p.gender.toLowerCase()) == 'he') {
+                if ($.trim(p.gender.toLowerCase()) === 'm' || $.trim(p.gender.toLowerCase()) === 'male' || $.trim(p.gender.toLowerCase()) === 'he') {
                     data_to_send.gender = 'm';
-                } else if ($.trim(p.gender.toLowerCase()) == 'f' || $.trim(p.gender.toLowerCase()) == 'female' || $.trim(p.gender.toLowerCase()) == 'she') {
+                } else if ($.trim(p.gender.toLowerCase()) === 'f' || $.trim(p.gender.toLowerCase()) === 'female' || $.trim(p.gender.toLowerCase()) === 'she') {
                     data_to_send.gender = 'f';
                 } else {
                     data_to_send.gender = '?';
@@ -456,7 +437,7 @@ app._update = function () {
             }
 
             if (p.webpage) {
-                if (p.webpage.indexOf('http') == -1) {
+                if (p.webpage.indexOf('http') === -1) {
                     data_to_send.webpage = 'http://' + p.webpage;
                 } else {
                     data_to_send.webpage = p.webpage;
@@ -489,25 +470,18 @@ app._update = function () {
 
             $scope.http.api(data_to_send).success(function (data) {
                 if (data.status) {
-
                     $scope.ui.addWarning('Your profile has been updated!');
 
                 } else if (data.errorText !== undefined) {
-
-                    $scope.ui.add($scope.ui.divider('*'), undefined, function () {
+                    $scope.ui.add($scope.ui.divider('*'), function () {
                         $scope.ui.addError('We have problems: ' + data.errorText);
                     });
-
                 } else {
-
                     $scope.ui.addError('Something went wrong. Please try again.');
-
                 }
             });
         }, 400);
-
     }, 400);
-
 };
 
 app._zeroPad = function (num, places) {
@@ -518,9 +492,7 @@ app._zeroPad = function (num, places) {
 app._ask_more_details = function () {
     $scope.ui.ask('Do you want to update your public profile?', true, function (resp) {
         if (resp) {
-
             $scope.http.api().success(function (avatars) {
-
                 $scope.ui.prompt('Your emoji avatar (use up/down keys)', false, [$scope.tempUserData.avatar, avatars], function (resp) {
 
                     $scope.tempUserData.avatar = resp;
@@ -557,31 +529,19 @@ app._ask_more_details = function () {
                                             $scope.ui.addWarning('Your bio: ' + resp);
 
                                             $scope.ui.prompt('Want to tag yourself (Ex: developer, nodejs, nerd, big data, ..)', false, $scope.tempUserData.tags, function (resp) {
-
                                                 $scope.tempUserData.tags = resp;
                                                 $scope.ui.addWarning('Tags: ' + resp);
 
                                                 app._ask_password_change();
-
                                             });
-
                                         });
-
                                     });
-
                                 });
-
                             });
-
                         });
-
                     });
-
-
                 });
             });
-
-
         } else {
             app._ask_password_change();
         }
@@ -597,14 +557,9 @@ app._ask_password_change = function () {
                 $scope.ui.addWarning('Entered password: ' + $scope.helpers.repeater('*', (resp ? resp.length : 8)));
 
                 $scope.ui.prompt('Password again (repeat)', true, false, function (resp) {
-
                     $scope.tempUserData.password_confirmation = resp;
                     $scope.ui.addWarning('Entered password confirmation: ' + $scope.helpers.repeater('*', (resp ? resp.length : 8)));
-
-
                     app._update();
-
-
                 });
 
             });
@@ -615,7 +570,6 @@ app._ask_password_change = function () {
 };
 
 app.update = function () {
-
     if (!localStorageService.get('cmd_accessToken')) {
         return $scope.ui.addLogin();
     }
@@ -623,13 +577,11 @@ app.update = function () {
     $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('📝UPDATE'), $scope.ui.br()], undefined, function () {
 
         $scope.http.api().then(function (response_data) {
-
             data = response_data.data;
 
             if (data.status === true) {
 
                 $scope.tempUserData = data.user_data.current_user;
-
                 $scope.ui.prompt('Email address', false, $scope.tempUserData.email, function (resp) {
 
                     $scope.tempUserData.email = resp;
@@ -646,52 +598,34 @@ app.update = function () {
                             $scope.ui.addWarning('Entered name: ' + resp);
 
                             app._ask_more_details();
-
                         });
-
-
                     });
-
                 });
-
             } else {
                 return $scope.ui.addError('User not found.');
             }
-
-
         });
-
     });
-
 };
 
-
 app.signout = function () {
-
     $scope.http.api().success(function (data) {
         if (data.status) {
-
             localStorageService.set('cmd_accessToken', data.access_token);
             localStorageService.set('uid', data.uid);
-
             $scope.ui.addWarning('You are now logged out..');
         }
     });
 };
 
-
 /**
  * Run app
  */
-
 app.init = function () {
-
     if (app.inited !== true) {
 
     }
-
     app.inited = true;
-
 };
 
 app.init();

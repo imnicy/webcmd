@@ -20,7 +20,6 @@ class Terminal:
             for command in commands:
                 command_explain[getattr(command, 'name')] = {
                     'arguments': getattr(command, 'arguments'),
-                    'options': getattr(command, 'options'),
                     'aliases': getattr(command, 'aliases')
                 }
 

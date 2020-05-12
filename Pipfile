@@ -9,6 +9,7 @@ verify_ssl = true
 python-dotenv = "*"
 flask-sqlalchemy = "*"
 flask-mysqldb = "*"
+jsmin = "*"
 
 [requires]
 python_version = "3.7"

@@ -99,7 +99,7 @@ class App:
         enable = False if getattr(app, 'hidden') else True
 
         if not app.get_command(command, enable):
-            raise CommandNotFound('app founded, bud command %s not found.' % query.command())
+            raise CommandNotFound('app founded, bud command %s not found.' % query.get_command())
 
         return {
             'status': True,

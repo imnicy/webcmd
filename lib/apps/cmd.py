@@ -28,9 +28,9 @@ class Cmd(Base):
                     example='cmd search Paris Hilton | cmd s -a Paris Hilton',
                     init='$scope.apps.cmd.search(query);'),
 
-            Command(name='go', arguments=['url', 'text'], help_string='Go to url',
+            Command(name='go', arguments=['url'], help_string='Go to url',
                     example='cmd go google.com | cmd go https://example.com',
-                    init='alert(text); alert(url);')
+                    init='$scope.apps.cmd.go(url);')
         ]
 
     def controller(self):

@@ -30,7 +30,6 @@ app.layouts = function (cb) {
     $scope.http.api().then(function (response) {
 
         var data = response.data;
-
         window.localStorage['layouts'] = JSON.stringify(data);
 
         if (cb) {
@@ -38,7 +37,6 @@ app.layouts = function (cb) {
         } else {
             return app.parseLayouts(data);
         }
-
     });
 };
 
@@ -46,10 +44,10 @@ app.parseLayouts = function (data) {
     var rt = [];
 
     rt.push($scope.ui.divider('-'));
-    rt.push($scope.ui.dye('Available layouts are listed below', 'orange'));
+    rt.push($scope.ui.dye('Available layouts are listed below'));
     rt.push($scope.ui.br());
 
-    rt.push($scope.ui.dye("default", 'white') + $scope.ui.dye($scope.helpers.repeater('.', 19), 'darkgray') + 'Usage: <cmd>cmd layout default</cmd>');
+    rt.push($scope.ui.dye("default") + $scope.ui.dye($scope.helpers.repeater('.', 19)) + 'Usage: <cmd>cmd layout default</cmd>');
     rt.push($scope.ui.br());
 
     for (var i = 0, t = data.length; i < t; i++) {
@@ -60,7 +58,7 @@ app.parseLayouts = function (data) {
             crd = '<cmd>search ' + lt.credits + '</cmd>';
         }
         lts = 26 - lt.name.length;
-        rt.push($scope.ui.dye(lt.name, 'white') + $scope.ui.dye($scope.helpers.repeater('.', lts), 'darkgray') + 'Usage: <cmd>cmd layout ' + lt.name + '</cmd>, Credits: ' + crd);
+        rt.push($scope.ui.dye(lt.name) + $scope.ui.dye($scope.helpers.repeater('.', lts)) + 'Usage: <cmd>cmd layout ' + lt.name + '</cmd>, Credits: ' + crd);
         rt.push($scope.ui.br());
     }
 
@@ -69,7 +67,9 @@ app.parseLayouts = function (data) {
 
 app.setLayout = function (name) {
 
-    if (name == 'none' || name == 'black' || name == 'reset' || name == 'default' || name == 'layout' || name == 'null' || name == 'nil' || name == 'empty' || name == 'unset') {
+    if (name === 'none' || name === 'black' || name === 'reset' || name === 'default' || name === 'layout' ||
+        name === 'null' || name === 'nil' || name === 'empty' || name === 'unset') {
+
         var lls = JSON.parse(window.localStorage['layout_data']);
         delete window.localStorage['layout_data'];
         $scope.ui.addWarning('Layout unset: ' + lls.name);
@@ -78,7 +78,7 @@ app.setLayout = function (name) {
         var data = JSON.parse(window.localStorage['layouts']);
 
         for (var i = 0, t = data.length; i < t; i++) {
-            if (data[i]['name'] == name) {
+            if (data[i]['name'] === name) {
                 window.localStorage['layout_data'] = JSON.stringify(data[i]);
                 $scope.ui.addInfo('Layout loading: ' + name);
                 return $scope.ui.runLayout();
@@ -139,7 +139,6 @@ app.about = function () {
 app.search = function(query) {
 
     $scope.ui.addInfo('Searching: ' + query);
-
     $scope.http.api({query: encodeURIComponent(query)}).then(function (response) {
 
         if (response.status !== 200) {
@@ -148,13 +147,13 @@ app.search = function(query) {
         }
 
         var data = response.data;
+        //
 
         $scope.ui.addWarning('Sorry! This function is not open.');
     });
 };
 
 app.go = function(url) {
-
     if (url.indexOf('http') === -1) {
         url = 'http://' + url;
     }
@@ -166,13 +165,11 @@ app.go = function(url) {
  * Run app
  */
 app.init = function () {
-
     if (app.inited !== true) {
 
     }
 
     app.inited = true;
-
 };
 
 app.init();

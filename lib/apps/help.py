@@ -19,9 +19,9 @@ class Help(Base):
             Command(name='pro', help_string='Advanced commands for pro users.', aliases=['all'],
                     init='$scope.apps.help.header(true, function() {$scope.apps.help.list(true)});'),
 
-            Command(name='app', help_string='Get help for an app.', arguments=['app_name'],
+            Command(name='app', help_string='Get help for an app.', arguments=['app_name', 'cmd_name?'],
                     example='help app cmd',
-                    init='var pro = flag === \'pro\' ? true : false; $scope.apps.help.list(pro, app_name)'),
+                    init='var pro = cmd_name ? true : false; $scope.apps.help.list(pro, app_name, cmd_name)'),
         ]
 
     def controller(self):

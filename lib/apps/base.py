@@ -1,4 +1,4 @@
-import json
+import json, re
 from ..capsule.exceptions import CommandNotFound
 
 
@@ -81,15 +81,12 @@ class Base:
 
             for name, item in data.items():
                 if name == 'init':
-                    arguments_in_callback = ''
-                    arguments = data.get('arguments', None)
-                    if arguments is not None:
-                        valid_arguments = []
-                        for argument in arguments:
-                            if argument is not None:
-                                valid_arguments.append(argument)
-
-                        arguments_in_callback = ','.join(valid_arguments)
+                    arguments = data.get('arguments', [])
+                    valid_arguments = []
+                    for argument in arguments:
+                        if isinstance(argument, str) and re.match(r"^[a-zA-Z_]\w+\??$", argument):
+                            valid_arguments.append(argument.replace('?', ''))
+                    arguments_in_callback = ','.join(valid_arguments)
                     parsed_data = 'function(%s){%s}' % (arguments_in_callback, item)
                 elif isinstance(item, str):
                     parsed_data = "'%s'" % item
