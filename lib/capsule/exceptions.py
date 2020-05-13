@@ -13,7 +13,7 @@ class TerminalException(Exception):
             'app': '',
             'queries': query,
             'status': False,
-            'errorText': str(self)
+            'error_text': str(self)
         }
 
         if self.SCRIPT is not None:
@@ -36,4 +36,8 @@ class ValidationError(TerminalException):
 
 
 class InvalidArgument(TerminalException):
+    pass
+
+
+class InvalidQueries(TerminalException):
     pass

@@ -1,2 +1,2 @@
-def flush_all_cache(command=None):
+def flush_all_cache():
     return 'success'

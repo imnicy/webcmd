@@ -1,5 +1,6 @@
 import json, re
 from jsmin import jsmin
+from ..capsule.query import Query
 from ..capsule.exceptions import CommandNotFound
 
 
@@ -60,15 +61,6 @@ class Base:
             self.get_commands()
 
         return self.enable_commands
-
-    def run_command(self, name=None):
-        if name is not None:
-            self.set_active_commands([name])
-            command = self.get_command(name)
-
-            if command:
-                return command.run()
-        raise CommandNotFound('command %s not found.' % name)
 
     def __load_command_scripts(self):
         scripts = []

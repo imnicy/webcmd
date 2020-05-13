@@ -15,7 +15,7 @@ class System(Base):
     def commands(self):
         return [
             Command(name='cache', arguments=['type'], caching=False,
-                    init='$scope.ui.add([\'You found something hidden\']);$scope.http.api();',
+                    init='$scope.ui.add([\'You found something hidden\']);',
                     command='lib.commands.system.flush_all_cache'),
 
             Command(name='welcome', caching=False, init='$scope.ui.add([\'Welcome system\'])')

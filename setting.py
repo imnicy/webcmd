@@ -41,14 +41,18 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
+
     SQLALCHEMY_DATABASE_URI = 'mysql://%s:%s@%s:%s/%s' % (
         env('DEV_DB_USER', 'user'),
         env('DEV_DB_PASSWORD', 'password'),
         env('DEV_DB_HOST', 'localhost'),
-        env('DEV_DB_PORT', 3306),
+        int(env('DEV_DB_PORT', 3306)),
         env('DEV_DB_NAME', 'database')
-    ),
+    )
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    SQLALCHEMY_ECHO = True
 
 
 class ProductionConfig(Config):
@@ -56,9 +60,10 @@ class ProductionConfig(Config):
         env('PRO_DB_USER', 'user'),
         env('PRO_DB_PASSWORD', 'password'),
         env('PRO_DB_HOST', 'localhost'),
-        env('PRO_DB_PORT', 3306),
+        int(env('PRO_DB_PORT', 3306)),
         env('PRO_DB_NAME', 'database')
     )
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 

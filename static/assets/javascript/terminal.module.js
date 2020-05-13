@@ -2129,13 +2129,13 @@ terminal.directive('terminal', function() {
 
 
             /**
-             * Run apps with query
+             * Run apps with queries
              *
-             * @param query
+             * @param queries
              * @returns {*|void}
              */
-            $scope.http.run = function(query) {
-                return $scope.http._get('post', '/run', {query: query});
+            $scope.http.run = function(queries) {
+                return $scope.http._get('post', '/run', {queries: queries});
             };
 
 

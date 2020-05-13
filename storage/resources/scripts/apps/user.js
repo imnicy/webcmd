@@ -65,6 +65,7 @@ app._validateUpdate = function () {
     return errors_arr;
 };
 
+
 app.signin = function () {
 
     if (localStorageService.get('cmd_accessToken')) {
@@ -90,8 +91,8 @@ app.signin = function () {
                         $scope.http.api({email_or_username: username_or_email, password: password}).success(function (data) {
                             if (data.status) {
                                 $scope.ui.addWarning('You are now logged in..', '🌟');
-                            } else if (data.errorText !== undefined) {
-                                $scope.ui.addError(data.errorText);
+                            } else if (data.error_text !== undefined) {
+                                $scope.ui.addError(data.error_text);
                             } else {
                                 $scope.ui.addError('Something went wrong. Please try again later.');
                             }
@@ -119,8 +120,8 @@ app.resend = function (email) {
                     $scope.http.api({email: email}).success(function (data) {
                         if (data.status) {
                             $scope.ui.addInfo('Your confirmation token has been resent.');
-                        } else if (data.errorText !== undefined) {
-                            $scope.ui.addError(data.errorText);
+                        } else if (data.error_text !== undefined) {
+                            $scope.ui.addError(data.error_text);
                         } else {
                             $scope.ui.addError('Something went wrong. Maybe account is already activated.');
                         }
@@ -136,8 +137,8 @@ app.resend = function (email) {
                 $scope.http.api({email: email}).success(function (data) {
                     if (data.status) {
                         $scope.ui.addInfo('Your confirmation token has been resent.');
-                    } else if (data.errorText !== undefined) {
-                        $scope.ui.addError(data.errorText);
+                    } else if (data.error_text !== undefined) {
+                        $scope.ui.addError(data.error_text);
                     } else {
                         $scope.ui.addError('Something went wrong. Maybe account is already activated.');
                     }
@@ -172,8 +173,8 @@ app.show = function (username) {
                             $scope.ui.addLine($scope.ui.br());
                             $scope.ui.addWarning('Done: Parse user profile');
                         });
-                    } else if (data.errorText !== undefined) {
-                        $scope.ui.addError(data.errorText);
+                    } else if (data.error_text !== undefined) {
+                        $scope.ui.addError(data.error_text);
                     } else {
                         $scope.ui.addError('Something went wrong.');
                     }
@@ -199,8 +200,8 @@ app.show = function (username) {
                         $scope.ui.addWarning('Done: Parse user profile');
                     });
 
-                } else if (data.errorText !== undefined) {
-                    $scope.ui.addError(data.errorText);
+                } else if (data.error_text !== undefined) {
+                    $scope.ui.addError(data.error_text);
                 } else {
                     $scope.ui.addError('Something went wrong. Maybe account is already activated.');
                 }
@@ -224,8 +225,8 @@ app.recover = function (email_or_username) {
                     $scope.http.api({email_or_username: email_or_username}).success(function (data) {
                         if (data.status) {
                             $scope.ui.addInfo('Email has been sent to your email.');
-                        } else if (data.errorText !== undefined) {
-                            $scope.ui.addError(data.errorText);
+                        } else if (data.error_text !== undefined) {
+                            $scope.ui.addError(data.error_text);
                         } else {
                             $scope.ui.addError('Something went wrong. Maybe account is already activated.');
                         }
@@ -241,8 +242,8 @@ app.recover = function (email_or_username) {
                 $scope.http.api({email_or_username: email_or_username}).success(function (data) {
                     if (data.status) {
                         $scope.ui.addInfo('Email has been sent to your email.');
-                    } else if (data.errorText !== undefined) {
-                        $scope.ui.addError(data.errorText);
+                    } else if (data.error_text !== undefined) {
+                        $scope.ui.addError(data.error_text);
                     } else {
                         $scope.ui.addError('Something went wrong. Maybe account is already activated.');
                     }
@@ -316,10 +317,10 @@ app.signup = function () {
 
                                             //app.welcome();
 
-                                        } else if (data.errorText !== undefined) {
+                                        } else if (data.error_text !== undefined) {
 
                                             $scope.ui.add($scope.ui.divider('*'), function () {
-                                                $scope.ui.addError('We have problems: ' + data.errorText);
+                                                $scope.ui.addError('We have problems: ' + data.error_text);
                                             });
 
                                         } else {
@@ -422,9 +423,9 @@ app._update = function () {
                 if (data.status) {
                     $scope.ui.addWarning('Your profile has been updated!');
 
-                } else if (data.errorText !== undefined) {
+                } else if (data.error_text !== undefined) {
                     $scope.ui.add($scope.ui.divider('*'), function () {
-                        $scope.ui.addError('We have problems: ' + data.errorText);
+                        $scope.ui.addError('We have problems: ' + data.error_text);
                     });
                 } else {
                     $scope.ui.addError('Something went wrong. Please try again.');
