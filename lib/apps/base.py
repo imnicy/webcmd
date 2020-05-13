@@ -169,3 +169,6 @@ class Base:
 
     def controller(self):
         raise NotImplementedError('controller function not implement.')
+
+    def __repr__(self):
+        return '<App %s: %s>' % (self.name, self.info)

@@ -197,7 +197,7 @@ body.theme-light .prompt-input {
 }
 .terminal-output {
     padding: 0 16px;
-    margin-bottom: 50px
+    /*margin-bottom: 50px*/
 }
 .divider {
     width: 100%;

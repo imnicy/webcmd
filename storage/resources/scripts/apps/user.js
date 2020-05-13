@@ -1,7 +1,6 @@
 /**
  * Define app.
  */
-
 var app = $scope.apps.user;
 
 app._validateSignup = function () {
@@ -19,13 +18,13 @@ app._validateSignup = function () {
         return errors_arr;
     }
 
-    if ($scope.tempUserData.password != $scope.tempUserData.password_confirmation) {
+    if ($scope.tempUserData.password !== $scope.tempUserData.password_confirmation) {
         errors_arr.push('Passwords doesn\'t match');
     } else if ($scope.tempUserData.password.length < 6) {
         errors_arr.push('Password is too short');
     }
 
-    if ($scope.tempUserData.email.indexOf('@') == -1 || $scope.tempUserData.email.indexOf('.') == -1) {
+    if ($scope.tempUserData.email.indexOf('@') === -1 || $scope.tempUserData.email.indexOf('.') === -1) {
         errors_arr.push('Email is wrong');
     }
 
@@ -34,7 +33,6 @@ app._validateSignup = function () {
     }
 
     return errors_arr;
-
 };
 
 app._validateUpdate = function () {
@@ -50,13 +48,13 @@ app._validateUpdate = function () {
         return errors_arr;
     }
 
-    if ($scope.tempUserData.password !== undefined && $scope.tempUserData.password != $scope.tempUserData.password_confirmation) {
+    if ($scope.tempUserData.password !== undefined && $scope.tempUserData.password !== $scope.tempUserData.password_confirmation) {
         errors_arr.push('Passwords doesn\'t match');
     } else if ($scope.tempUserData.password !== undefined && $scope.tempUserData.password.length < 6) {
         errors_arr.push('Password is too short');
     }
 
-    if ($scope.tempUserData.email.indexOf('@') == -1 || $scope.tempUserData.email.indexOf('.') == -1) {
+    if ($scope.tempUserData.email.indexOf('@') === -1 || $scope.tempUserData.email.indexOf('.') === -1) {
         errors_arr.push('Email is wrong');
     }
 
@@ -65,7 +63,6 @@ app._validateUpdate = function () {
     }
 
     return errors_arr;
-
 };
 
 app.signin = function () {
@@ -74,7 +71,7 @@ app.signin = function () {
         return $scope.ui.addError('You are already logged in. You can logout by using <cmd>user logout</cmd> cmd.');
     }
 
-    $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('🔒LOGIN'), $scope.ui.br()], undefined, function () {
+    $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('🔒LOGIN'), $scope.ui.br()], function () {
         var username_or_email = '';
         var password = '';
 
@@ -83,22 +80,16 @@ app.signin = function () {
             $scope.ui.addWarning('Entered username or email: ' + resp);
             $scope.ui.prompt('Password', true, false, function (resp) {
                 password = resp;
-
                 $scope.ui.addWarning('Entered password: ' + $scope.helpers.repeater('*', (resp ? resp.length : 8)));
-
                 $scope.ui.addInfo('Setting up XMLHttpRequest..');
-
 
                 $timeout(function () {
                     $scope.ui.addInfo('Please wait... Authenticating new session...');
 
                     $timeout(function () {
-
                         $scope.http.api({email_or_username: username_or_email, password: password}).success(function (data) {
-
                             if (data.status) {
                                 $scope.ui.addWarning('You are now logged in..', '🌟');
-
                             } else if (data.errorText !== undefined) {
                                 $scope.ui.addError(data.errorText);
                             } else {
@@ -106,13 +97,10 @@ app.signin = function () {
                             }
                         });
                     }, 400);
-
                 }, 400);
-
             });
         });
     });
-
 };
 
 app.resend = function (email) {
@@ -123,9 +111,7 @@ app.resend = function (email) {
             $scope.ui.prompt('Email address', false, false, function (resp) {
                 email = resp;
                 $scope.ui.addWarning('Entered email address: ' + resp);
-
                 $scope.ui.addInfo('Setting up XMLHttpRequest..');
-
 
                 $timeout(function () {
                     $scope.ui.addInfo('Please wait... Sending request to imnicy.com servers...');
@@ -139,13 +125,10 @@ app.resend = function (email) {
                             $scope.ui.addError('Something went wrong. Maybe account is already activated.');
                         }
                     });
-
                 }, 400);
-
             });
         } else {
             $scope.ui.addInfo('Setting up XMLHttpRequest..');
-
 
             $timeout(function () {
                 $scope.ui.addInfo('Please wait... Sending request to imnicy.com servers...');
@@ -159,7 +142,6 @@ app.resend = function (email) {
                         $scope.ui.addError('Something went wrong. Maybe account is already activated.');
                     }
                 });
-
             }, 400);
         }
     });
@@ -173,17 +155,13 @@ app.show = function (username) {
         $scope.ui.prompt('Enter an username to show profile (type \'me\' for your profile)', false, false, function (resp) {
             username = resp;
             $scope.ui.addWarning('Username: ' + resp);
-
-
             $scope.ui.addInfo('Setting up XMLHttpRequest..');
-
 
             $timeout(function () {
                 $scope.ui.addInfo('Please wait... Sending request to imnicy.com servers...');
 
                 $scope.http.api({username: username}).success(function (data) {
                     if (data.status) {
-
                         $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('👤PROFILE:' + username || ''), $scope.ui.br()], undefined, function () {
                             angular.forEach(data.user_data.current_user, function (value, key) {
                                 if (value) {
@@ -193,30 +171,23 @@ app.show = function (username) {
 
                             $scope.ui.addLine($scope.ui.br());
                             $scope.ui.addWarning('Done: Parse user profile');
-
                         });
-
                     } else if (data.errorText !== undefined) {
                         $scope.ui.addError(data.errorText);
                     } else {
                         $scope.ui.addError('Something went wrong.');
                     }
                 });
-
             }, 400);
-
-
         });
     } else {
         $scope.ui.addInfo('Setting up XMLHttpRequest..');
-
 
         $timeout(function () {
             $scope.ui.addInfo('Please wait... Sending request to imnicy.com servers...');
 
             $scope.http.api({username: username}).success(function (data) {
                 if (data.status) {
-
                     $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('👤PROFILE:' + username || ''), $scope.ui.br()], undefined, function () {
                         angular.forEach(data.user_data.current_user, function (value, key) {
                             if (value) {
@@ -226,7 +197,6 @@ app.show = function (username) {
 
                         $scope.ui.addLine($scope.ui.br());
                         $scope.ui.addWarning('Done: Parse user profile');
-
                     });
 
                 } else if (data.errorText !== undefined) {
@@ -235,26 +205,18 @@ app.show = function (username) {
                     $scope.ui.addError('Something went wrong. Maybe account is already activated.');
                 }
             });
-
         }, 400);
     }
-
-
 };
 
 app.recover = function (email_or_username) {
-
-    $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('📩RECOVER ACCOUNT'), $scope.ui.br()], undefined, function () {
+    $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('📩RECOVER ACCOUNT'), $scope.ui.br()], function () {
 
         if (email_or_username === undefined || email_or_username === 'retrieve' || email_or_username === 'recover' || email_or_username === 'forget') {
-
             $scope.ui.prompt('Email or username', false, false, function (resp) {
                 email_or_username = resp;
                 $scope.ui.addWarning('Entered email or username: ' + resp);
-
-
                 $scope.ui.addInfo('Setting up XMLHttpRequest..');
-
 
                 $timeout(function () {
                     $scope.ui.addInfo('Please wait... Sending request to imnicy.com servers...');
@@ -268,13 +230,10 @@ app.recover = function (email_or_username) {
                             $scope.ui.addError('Something went wrong. Maybe account is already activated.');
                         }
                     });
-
                 }, 400);
-
             });
         } else {
             $scope.ui.addInfo('Setting up XMLHttpRequest..');
-
 
             $timeout(function () {
                 $scope.ui.addInfo('Please wait... Sending request to imnicy.com servers...');
@@ -288,26 +247,20 @@ app.recover = function (email_or_username) {
                         $scope.ui.addError('Something went wrong. Maybe account is already activated.');
                     }
                 });
-
             }, 400);
         }
     });
-
 };
 
 app.signup = function () {
-
-    $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('🔓SIGNUP'), $scope.ui.br()], undefined, function () {
-
+    $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('🔓SIGNUP'), $scope.ui.br()], function () {
         if (!$scope.tempUserData) {
             $scope.tempUserData = {};
         }
 
         $scope.ui.prompt('Email', false, $scope.tempUserData.email, function (resp) {
-
             $scope.tempUserData.email = resp;
             $scope.ui.addWarning('Entered email address: ' + resp);
-
             $scope.ui.prompt('Username (min 3 chars)', false, $scope.tempUserData.username, function (resp) {
 
                 $scope.tempUserData.username = resp;
@@ -341,15 +294,12 @@ app.signup = function () {
                                 return false;
                             }
 
-
                             $scope.ui.addInfo('Setting up XMLHttpRequest..');
-
 
                             $timeout(function () {
                                 $scope.ui.addInfo('Running server-side validations, please wait..');
 
                                 $timeout(function () {
-
 
                                     var p = $scope.tempUserData;
 
@@ -574,7 +524,7 @@ app.update = function () {
         return $scope.ui.addLogin();
     }
 
-    $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('📝UPDATE'), $scope.ui.br()], undefined, function () {
+    $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('📝UPDATE'), $scope.ui.br()], function () {
 
         $scope.http.api().then(function (response_data) {
             data = response_data.data;

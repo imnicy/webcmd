@@ -21,7 +21,8 @@ class Config:
         'apps': [
             'lib.apps.help.Help',
             'lib.apps.cmd.Cmd',
-            'lib.apps.system.System'
+            'lib.apps.system.System',
+            'lib.apps.user.User'
         ],
 
         'auth': []

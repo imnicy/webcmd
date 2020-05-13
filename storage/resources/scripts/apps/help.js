@@ -37,7 +37,7 @@ app.header = function(pro,callback) {
     $scope.ui.add(h, callback);
 };
 
-app.list = function(pro,only_app, only_cmd) {
+app.list = function(pro, only_app, only_cmd) {
     var rpt = 50;
 
     $scope.http.get('', {cache: true}).then(function(response){
@@ -52,6 +52,10 @@ app.list = function(pro,only_app, only_cmd) {
                 return;
             }
 
+            if(!pro && !v.show_on_help) {
+                return;
+            }
+
             app_found = true;
             add.push($scope.ui.listHeader(v.name.toUpperCase() + ' APP:' + v.info));
 
@@ -61,7 +65,7 @@ app.list = function(pro,only_app, only_cmd) {
 
                 if (only_cmd && typeof(only_cmd) == 'string') {
                     if (nv.name !== only_cmd) {
-                        continue;
+                        return;
                     }
                 }
 

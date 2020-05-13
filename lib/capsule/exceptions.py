@@ -31,5 +31,9 @@ class CommandNotFound(TerminalException):
     SCRIPT = '$scope.term.returnError(4404);'
 
 
+class ValidationError(TerminalException):
+    SCRIPT = '$scope.term.returnError(302);'
+
+
 class InvalidArgument(TerminalException):
     pass

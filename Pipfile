@@ -10,6 +10,7 @@ python-dotenv = "*"
 flask-sqlalchemy = "*"
 flask-mysqldb = "*"
 jsmin = "*"
+cerberus = "*"
 
 [requires]
 python_version = "3.7"
