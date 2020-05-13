@@ -2,14 +2,20 @@ import os
 from dotenv import find_dotenv, load_dotenv
 
 
-def env(name, default=None):
+def env(name, default=None, force_default=False):
     """
     get env config value from environ
+    :param force_default: bool
     :param name: string
     :param default: string
     :return: str
     """
-    return os.getenv(name, default)
+    value = os.getenv(name, default)
+
+    if force_default and (not value or value == '' or value is None):
+        return default
+
+    return value
 
 
 class Config:
@@ -46,7 +52,7 @@ class DevelopmentConfig(Config):
         env('DEV_DB_USER', 'user'),
         env('DEV_DB_PASSWORD', 'password'),
         env('DEV_DB_HOST', 'localhost'),
-        int(env('DEV_DB_PORT', 3306)),
+        int(env('DEV_DB_PORT', 3306, True)),
         env('DEV_DB_NAME', 'database')
     )
 
@@ -60,7 +66,7 @@ class ProductionConfig(Config):
         env('PRO_DB_USER', 'user'),
         env('PRO_DB_PASSWORD', 'password'),
         env('PRO_DB_HOST', 'localhost'),
-        int(env('PRO_DB_PORT', 3306)),
+        int(env('PRO_DB_PORT', 3306, True)),
         env('PRO_DB_NAME', 'database')
     )
 

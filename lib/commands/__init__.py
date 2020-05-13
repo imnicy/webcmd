@@ -1,6 +1,8 @@
+from flask import g
 from werkzeug.local import LocalProxy
 from providers.validate import Validator
-from ..capsule.exceptions import ValidationError
+from ..capsule.exceptions import ValidationError, TerminalException
+from ..capsule.mark import get_mark
 
 
 def validate(document, scheme=None, messages=None):
@@ -18,3 +20,18 @@ def validate(document, scheme=None, messages=None):
         raise ValidationError(messages[0])
 
     return document_or_error
+
+
+def get_query():
+    """
+    globals Query object in local proxy
+    use: g.query().get_app(), g.query().get_command(), g.query().get_arguments()
+    :return Query
+    """
+    query = g.get('query', None)
+
+    if get_mark('process') == 'run':
+        if query is None:
+            raise TerminalException('query is invalid on local proxy.')
+
+    return query

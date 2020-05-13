@@ -13,7 +13,7 @@ class Cmd(Base):
     def commands(self):
         return [
             Command(name='index', help_string='cmd is toolkit of imnicy.com', caching=True,
-                    init='$scope.ui.addWarning(\'You can enter cmd <cmd>help app cmd<cmd> for more help.\');'),
+                    init='$scope.ui.addWarning(\'You can enter cmd <cmd>help app cmd</cmd> for more help.\');'),
 
             Command(name='layouts', help_string='Show all available layouts', caching=True, example='cmd layouts',
                     init='$scope.apps.cmd.layouts();', command='lib.commands.collection.layouts'),

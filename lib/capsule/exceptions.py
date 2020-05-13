@@ -1,17 +1,12 @@
-from flask import make_response, request
+from flask import make_response
 
 
 class TerminalException(Exception):
 
-    SCRIPT = None
+    SCRIPT = '$scope.term.returnError(\'System error\');'
 
     def to_response(self):
-        query = request.values.get('query', None)
-        if query is None and request.json is not None:
-            query = request.json.get('query', '')
         content = {
-            'app': '',
-            'queries': query,
             'status': False,
             'error_text': str(self)
         }
@@ -36,8 +31,8 @@ class ValidationError(TerminalException):
 
 
 class InvalidArgument(TerminalException):
-    pass
+    SCRIPT = '$scope.term.returnError(5403);'
 
 
 class InvalidQueries(TerminalException):
-    pass
+    SCRIPT = '$scope.term.returnError(4403);'

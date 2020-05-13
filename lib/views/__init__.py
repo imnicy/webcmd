@@ -1,11 +1,11 @@
 from flask import Blueprint
-from importlib import import_module
+from helper import import_module_from_string
 
 
-loaded_views = {
-    'api_blue': '.api',
-    'terminal_blue': '.terminal'
-}
+loaded_views = [
+    '.api.api_blue',
+    '.terminal.terminal_blue'
+]
 
 
 class NestableBlueprint(Blueprint):
@@ -21,7 +21,6 @@ class NestableBlueprint(Blueprint):
 views_blue = NestableBlueprint('views', __name__)
 
 
-for name, cls in loaded_views.items():
-    loaded = import_module(cls, package=__name__)
-    blue = getattr(loaded, name)
+for view_cls in loaded_views:
+    blue = import_module_from_string(view_cls, package=__name__)
     views_blue.register_blueprint(blue)

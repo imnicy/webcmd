@@ -41,7 +41,7 @@ app.list = function(pro, only_app, only_cmd) {
     var rpt = 50;
 
     $scope.http.get('', {cache: true}).then(function(response){
-        app_found = false;
+        var app_found = false;
         var add = [];
 
         // May cause a dead cycle
@@ -65,7 +65,7 @@ app.list = function(pro, only_app, only_cmd) {
 
                 if (only_cmd && typeof(only_cmd) == 'string') {
                     if (nv.name !== only_cmd) {
-                        return;
+                        continue;
                     }
                 }
 

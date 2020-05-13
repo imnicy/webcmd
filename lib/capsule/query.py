@@ -1,24 +1,38 @@
-from flask import g
+from flask import g, current_app
 from .exceptions import InvalidQueries
 from .app import application
-from .exceptions import AppNotFound, CommandNotFound
+from .exceptions import AppNotFound, CommandNotFound, InvalidArgument
 
 
 class Query:
 
-    app = None
-    command = None
-    queries = None
-
     def __init__(self, queries):
+
+        self.app = None
+        self.command = None
         self.arguments = []
         self.queries = queries
+
+        """
+        cache found items
+        """
+        self.found = {
+            'app': None,
+            'command': None,
+            'arguments': None
+        }
+
         """
         parse queries string
         get app,command,arguments from it
         and push this to local proxy
         """
         self.parse(queries)
+
+        """
+        logging query run records
+        """
+        current_app.logger.debug('run query with queries: %s' % queries)
 
     def parse(self, queries):
         joined = [] if queries is None else queries.strip().split(' ')
@@ -44,10 +58,16 @@ class Query:
         get command app object
         :return: App
         """
+        found_app = self.found.get('app')
+        if found_app is not None:
+            return found_app
+
         app = application.get(self.app, True)
 
         if not app:
             raise AppNotFound('app not found from queries %s' % self.queries)
+
+        self.found['app'] = app
 
         return app
 
@@ -56,6 +76,10 @@ class Query:
         get command object
         :return: Command
         """
+        found_command = self.found.get('command')
+        if found_command is not None:
+            return found_command
+
         app = self.get_app()
         command = self.command
 
@@ -66,7 +90,31 @@ class Query:
         if not command:
             raise CommandNotFound('command not found from queries %s' % self.queries)
 
+        self.found['command'] = command
+
         return command
 
     def get_arguments(self):
-        return self.arguments
+        """
+        get arguments from queries
+        :return: dict
+        """
+        found_arguments = self.found.get('arguments')
+        if found_arguments is not None:
+            return found_arguments
+
+        arguments = {}
+        command = self.get_command()
+        command_arguments = command.arguments
+
+        for _k, _v in enumerate(command_arguments):
+            if _v.endswith('?'):
+                arguments[_v[0:-1]] = None if _k not in self.arguments else self.arguments[_k]
+            else:
+                if len(self.arguments) <= _k:
+                    raise InvalidArgument('invalid argument or argument not found: %s.' % _v)
+                arguments[_v] = self.arguments[_k]
+
+        self.found['arguments'] = arguments
+
+        return arguments

@@ -1362,6 +1362,22 @@ terminal.directive('terminal', function() {
                     ];
                 }
 
+                if(error_code === 5403) {
+                    m = [
+                        $scope.ui.divider("-"),
+                        $scope.ui.dye("☉ The arguments of the command is too few or the format is incorrect. Please try again", 'red')
+                    ];
+                }
+
+                if(error_code === 4403) {
+                    m = [
+                        $scope.ui.divider("-"),
+                        $scope.ui.dye("☉ The command you output is wrong or not allowed", 'red'),
+                        "You can try this command learn how to use the system:",
+                        "<cmd>help app cmd</cmd>"
+                    ];
+                }
+
                 if(error_code === 2404) {
                     m = [
                         $scope.ui.divider("-"),

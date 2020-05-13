@@ -1,7 +1,7 @@
-import json, re
+import json
+import re
+
 from jsmin import jsmin
-from ..capsule.query import Query
-from ..capsule.exceptions import CommandNotFound
 
 
 class Base:
@@ -27,11 +27,11 @@ class Base:
         self.active_commands = commands
         return self
 
-    def get_command(self, name, enable=True):
+    def get_command(self, name=None, enable=True):
         commands = self.get_enable_commands() if enable else self.get_commands(True)
 
         for found in commands:
-            if found.name == name or name in found.aliases:
+            if name is not None or found.name == name or name in found.aliases:
                 return found
 
         return False

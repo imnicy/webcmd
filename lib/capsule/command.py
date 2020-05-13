@@ -1,4 +1,5 @@
 from importlib import import_module
+from helper import import_module_from_string
 
 
 class Command:
@@ -29,8 +30,8 @@ class Command:
         self.caching = caching
         self.pro = pro
         self.example = example
+        self.callable = command
 
-        self.__bind_command(command)
         self.__init_script(init)
 
     def __init_script(self, script):
@@ -40,17 +41,6 @@ class Command:
             self.init = script()
         if not isinstance(self.init, str):
             self.init = None
-
-    def __bind_command(self, command):
-        if isinstance(command, str):
-            if command in locals().keys() or command in dir():
-                self.callable = command
-            elif '.' in command:
-                cls, cmd = command.rsplit('.', maxsplit=1)
-                module = import_module(cls)
-                self.callable = getattr(module, cmd)
-        elif hasattr(command, '__call__'):
-            self.callable = command
 
     def __parse_arguments(self, arguments):
         self.arguments = []
@@ -73,8 +63,18 @@ class Command:
 
     def run(self):
         the_callable = self.callable
+
+        if isinstance(the_callable, str):
+            if the_callable in globals().keys():
+                the_callable = globals().get(the_callable)
+            elif '.' in the_callable:
+                the_callable = import_module_from_string(the_callable, package=__name__)
+            else:
+                the_callable = None
+
         if the_callable is not None and hasattr(the_callable, '__call__'):
             return the_callable()
+
         return None
 
     def allow_cache(self):
@@ -91,7 +91,7 @@ class Command:
             'pro': self.pro,
             'help': self.help_string,
             'name': self.name,
-            'auth': self.auth_level,
+            # 'auth': self.auth_level,
             'example': self.example,
             'aliases': self.aliases,
             'arguments': arguments,

@@ -1,12 +1,12 @@
-from flask import request, g
-from . import validate
+from flask import request
+from . import validate, get_query
 from ..models.auth import User
 
 """
-globals Query object in local proxy
-use: g.query.get_app(), g.query.get_command(), g.query.get_arguments()
+get query arguments from local proxy globals
+arguments is a dict
 """
-query = g.get('query', None)
+arguments = get_query().get_arguments()
 
 
 def login():
@@ -46,17 +46,20 @@ def register():
     pass
 
 
-def resend(email=None):
+def resend():
+    email = arguments.get('email', None)
     pass
 
 
-def recover(credential=None):
+def recover():
+    credential = arguments.get('credential', None)
     pass
 
 
-def show(command=None, username=None):
+def show():
+    username = arguments.get('username', None)
     pass
 
 
-def update(command=None):
+def update():
     pass
