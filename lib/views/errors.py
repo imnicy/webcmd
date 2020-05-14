@@ -1,29 +1,36 @@
-from flask import Blueprint
+from flask import Blueprint, current_app
+from flask_jwt_extended import create_access_token
 from providers.jwt import jwt
-from ..capsule.exceptions import TokenDiscarded, TokenExpired, TerminalException
+from ..capsule.exceptions import TokenDiscarded, TokenExpired, AppNotFound
 
 errors_blue = Blueprint('errors', __name__)
 
 
+@errors_blue.errorhandler(404)
+def page_not_found():
+    return AppNotFound('app not found from errorhandle 404.').to_response()
+
+
+# @errors_blue.errorhandler(500)
+# def system_error():
+#     pass
+
+
 @jwt.unauthorized_loader
 def handle_auth_error(e):
-    try:
-        raise TokenDiscarded(str(e))
-    except TerminalException as te:
-        return te.to_response()
+    return TokenDiscarded(str(e)).to_response()
 
 
 @jwt.expired_token_loader
 def handle_expired_error(e):
-    try:
-        raise TokenExpired(str(e))
-    except TerminalException as te:
-        return te.to_response()
+    identify = e.get(current_app.config.get('JWT_IDENTITY_CLAIM', 'identify'), None)
+    response = TokenExpired('access token expired.').to_response()
+
+    response.headers['Authorization'] = create_access_token(identify)
+
+    return response
 
 
 @jwt.invalid_token_loader
 def handle_invalid_header_error(e):
-    try:
-        raise TokenDiscarded(str(e))
-    except TerminalException as te:
-        return te.to_response()
+    return TokenDiscarded(str(e)).to_response()

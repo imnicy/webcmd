@@ -1,7 +1,10 @@
 from flask import request, make_response
 from . import validate, get_query
 from ..models.auth import User
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from ..capsule.exceptions import TokenDiscarded
+from flask_jwt_extended import (
+    create_access_token, get_jwt_identity, jwt_required, jwt_refresh_token_required
+)
 
 """
 get query arguments from local proxy globals
@@ -94,6 +97,7 @@ def update():
     pass
 
 
+@jwt_refresh_token_required
 def token():
     document = validate(request, {
         'operation': {
@@ -103,5 +107,13 @@ def token():
     })
 
     operation = document.get('operation')
+
+    if operation == 'refresh':
+        response = make_response({'status': True})
+        response.headers['Authorization'] = create_access_token(get_jwt_identity())
+
+        return response
+    elif operation == 'remove':
+        raise TokenDiscarded('token has removed.')
 
     return {'status': True}
