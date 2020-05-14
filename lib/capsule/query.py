@@ -1,4 +1,6 @@
-from flask import g, current_app
+import helper
+
+from flask import g, request
 from .exceptions import InvalidQueries
 from .app import application
 from .exceptions import AppNotFound, CommandNotFound, InvalidArgument
@@ -32,7 +34,7 @@ class Query:
         """
         logging query run records
         """
-        current_app.logger.debug('run query with queries: %s' % queries)
+        helper.debug('run command with queries: %s' % queries)
 
     def parse(self, queries):
         joined = [] if queries is None else queries.strip().split(' ')
@@ -109,7 +111,7 @@ class Query:
 
         for _k, _v in enumerate(command_arguments):
             if _v.endswith('?'):
-                arguments[_v[0:-1]] = None if _k not in self.arguments else self.arguments[_k]
+                arguments[_v[0:-1]] = None if _k > len(self.arguments) else self.arguments[_k]
             else:
                 if len(self.arguments) <= _k:
                     raise InvalidArgument('invalid argument or argument not found: %s.' % _v)

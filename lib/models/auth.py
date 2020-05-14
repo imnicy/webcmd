@@ -5,6 +5,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 Base = db.Model
 
 
+def to_dict(self):
+    return {c.name: getattr(self, c.name, None) for c in self.__table__.columns}
+
+
+Base.to_dict = to_dict
+
+
 class User(Base):
     __tablename__ = 'iy_terminal_user_auth'
 
@@ -30,7 +37,6 @@ class User(Base):
     fullname = db.Column(db.String(32), unique=True)
     webpage = db.Column(db.String(191), nullable=True)
     github = db.Column(db.String(191), nullable=True)
-    remember_token = db.Column(db.String(100), nullable=True)
 
     created_at = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now, onupdate=datetime.datetime.now)
@@ -48,6 +54,20 @@ class User(Base):
 
     def available_user(self):
         return self.state > 0
+
+    @staticmethod
+    def authenticate(username, password):
+        found_user = User.query.filter_by(username=username).first()
+        if found_user and found_user.verify_password(password):
+            return found_user
+
+    @staticmethod
+    def identify(identify):
+        if identify is None:
+            return None
+
+        user_id = identify
+        return User.query.filter_by(id=user_id).first()
 
     def __repr__(self):
         return '<User %s>' % self.username

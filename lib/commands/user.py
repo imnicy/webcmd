@@ -1,6 +1,7 @@
-from flask import request
+from flask import request, make_response
 from . import validate, get_query
 from ..models.auth import User
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
 """
 get query arguments from local proxy globals
@@ -10,7 +11,7 @@ arguments = get_query().get_arguments()
 
 
 def login():
-    document = validate(request, {
+    document = validate(request, scheme={
         'email_or_username': {
             'required': True,
             'type': 'string',
@@ -18,28 +19,30 @@ def login():
             'min': 3, 'max': 32
         },
         'password': {'required': True, 'type': 'string', 'min': 6, 'max': 32}
-    }, {
+    }, messages={
         'email_or_username.regex': 'username error.'
     })
 
     username = document.get('email_or_username')
     password = document.get('password')
 
-    found_user = User.query.filter_by(username=username).first()
+    user = User.authenticate(username, password)
 
-    if found_user is not None:
-        if not found_user.verify_password(password):
-            return {'status': False, 'error_text': 'password verify failed!'}
-        if not found_user.available_user():
-            return {'status': False, 'error_text': 'user not available!'}
-    else:
-        return {'status': False, 'error_text': 'user not found!'}
+    if user is None:
+        return {'status': False, 'error_text': 'authenticate failed.'}
 
-    return {'status': True}
+    response = make_response({'status': True})
+    response.headers['Authorization'] = create_access_token(user.id)
+
+    return response
 
 
 def logout():
-    pass
+    """
+    log out
+    :return: dict
+    """
+    return {'status': True}
 
 
 def register():
@@ -56,10 +59,49 @@ def recover():
     pass
 
 
+@jwt_required
 def show():
-    username = arguments.get('username', None)
-    pass
+    document = validate(request,scheme={
+            'username': {
+                'required': True,
+                'type': 'string',
+                'regex': '[\w_\-@\.]+',
+                'min': 3, 'max': 32
+            }
+        },messages={
+            'username.regex': 'username error.'
+        }, extra=arguments
+    )
+
+    username = document.get('username', None)
+
+    if username is None or not isinstance(username, str):
+        return {'status': False}
+
+    if username == 'me':
+        print(get_jwt_identity())
+        user = User.identify(get_jwt_identity())
+    else:
+        user = User.query.filter_by(username=username).first()
+
+    if user is None:
+        return {'status': False, 'error_text': 'user not found.'}
+
+    return {'status': True, 'user_data': user.to_dict()}
 
 
 def update():
     pass
+
+
+def token():
+    document = validate(request, {
+        'operation': {
+            'type': 'string',
+            'in': ['refresh', 'remove']
+        }
+    })
+
+    operation = document.get('operation')
+
+    return {'status': True}

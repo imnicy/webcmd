@@ -19,9 +19,25 @@ def env(name, default=None, force_default=False):
 
 
 class Config:
-    ENV_LOADED = False
 
     SECRET_KEY = env('SECRET_KEY', 'secret key')
+
+    REDIS_URL = 'redis://:%s@%s:%d/%d' % (
+        env('REDIS_PASSWORD', ''),
+        env('REDIS_HOST', 'localhost'),
+        int(env('REDIS_PORT', 6379, True)),
+        int(env('REDIS_DATABASE', 0, True))
+    )
+
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ECHO = False
+    SQLALCHEMY_DATABASE_URI = 'mysql://%s:%s@%s:%d/%s' % (
+        env('DB_USER', 'user'),
+        env('DB_PASSWORD', 'password'),
+        env('DB_HOST', 'localhost'),
+        int(env('DB_PORT', 3306, True)),
+        env('DB_NAME', 'database')
+    )
 
     TERMINAL_CONFIGS = {
         'apps': [
@@ -40,42 +56,9 @@ class Config:
         'handlers': ['wsgi']
     }
 
+    JWT_SECRET_KEY = 'webcmd_token'
+
     @staticmethod
     def bootstrap():
-        load_dotenv(find_dotenv('.env'))
+        pass
 
-
-class DevelopmentConfig(Config):
-    DEBUG = True
-
-    SQLALCHEMY_DATABASE_URI = 'mysql://%s:%s@%s:%s/%s' % (
-        env('DEV_DB_USER', 'user'),
-        env('DEV_DB_PASSWORD', 'password'),
-        env('DEV_DB_HOST', 'localhost'),
-        int(env('DEV_DB_PORT', 3306, True)),
-        env('DEV_DB_NAME', 'database')
-    )
-
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-    SQLALCHEMY_ECHO = True
-
-
-class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'mysql://%s:%s@%s:%s/%s' % (
-        env('PRO_DB_USER', 'user'),
-        env('PRO_DB_PASSWORD', 'password'),
-        env('PRO_DB_HOST', 'localhost'),
-        int(env('PRO_DB_PORT', 3306, True)),
-        env('PRO_DB_NAME', 'database')
-    )
-
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-
-configs = {
-    'development': DevelopmentConfig,
-    'production': ProductionConfig,
-
-    'default': DevelopmentConfig
-}

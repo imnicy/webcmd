@@ -1,35 +1,36 @@
 import os
 from flask import Flask
-from setting import configs
+from flask_wtf import CSRFProtect
+from flask_jwt_extended import JWTManager
+from setting import Config
 from providers.db import database
+from providers.redis import store as redis_store
 from providers.logger import register as logger_register
+from providers.jwt import jwt as jwt_manager
 from lib.views import views_blue
-from lib.capsule.app import application as cmd_app_capsule
+from lib import foundation
 
 
-def create_app(environ=None):
+def create_app():
     """
     create flask web manager
     from environ
-    :param environ: development, production, default
     :return: Flask
     """
-    if environ is None or environ not in configs:
-        environ = 'default'
-
     # environ bootstrap
-    config = configs.get(environ)
-    config.bootstrap()
+    Config.bootstrap()
 
     # register app logger
-    logger_register(os.path.dirname(__file__), config.LOGGER)
+    logger_register(os.path.dirname(__file__), Config.LOGGER)
 
     # make flask manager
     app = Flask(__name__)
-    app.config.from_object(config)
+    app.config.from_object(Config)
 
-    # init database use SQLAlchmy
-    database.init_app(app)
+    database.init_app(app)  # init database use SQLAlchmy
+    redis_store.init_app(app)   # init redis store database use flask-redis
+    jwt_manager.init_app(app)  # init json web token manager
+    CSRFProtect(app)    # init CSRF protect
 
     return load_blueprints(load_blinker(app))
 
@@ -41,8 +42,8 @@ def load_blinker(app):
     :return: Flask
     """
     @app.before_request
-    def load_command_apps():
-        cmd_app_capsule.register()
+    def boot_library_foundation():
+        foundation.boot()
 
     return app
 

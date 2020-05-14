@@ -36,11 +36,15 @@ class User(Base):
                     pro=True, init='$scope.apps.user.recover(credential);', command='lib.commands.user.recover'),
 
             Command(name='show', help_string='Show profile of cmd user.', aliases=['profile', 'info'],
-                    example='user show | user show example', arguments=['username?'], pro=True,
+                    example='user show | user show example', arguments=['username?'], pro=True, auth_level=0,
                     init='$scope.apps.user.show(username);', command='lib.commands.user.show'),
 
-            Command(name='update', help_string='Update your profile.', example='user update', pro=True,
-                    init='$scope.apps.user.update();', command='lib.commands.user.update')
+            Command(name='update', help_string='Update your profile.', example='user update', pro=True, auth_level=0,
+                    init='$scope.apps.user.update();', command='lib.commands.user.update'),
+
+            Command(name='token', help_string='Access token operate.', arguments=['operation'], auth_level=0,
+                    example='user token refresh | user token remove', pro=True,
+                    init='$scope.apps.user.token(operation);', command='lib.commands.user.token')
         ]
 
     def controller(self):

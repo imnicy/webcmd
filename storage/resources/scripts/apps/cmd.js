@@ -13,7 +13,6 @@ if (!app.search_list) {
 
 app.layouts = function (cb) {
     $scope.ui.addInfo('Loading layouts..');
-
     var json = window.localStorage['layouts'];
 
     if (json !== undefined) {
@@ -28,7 +27,6 @@ app.layouts = function (cb) {
     }
 
     $scope.http.api().then(function (response) {
-
         var data = response.data;
         window.localStorage['layouts'] = JSON.stringify(data);
 

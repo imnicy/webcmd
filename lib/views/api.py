@@ -1,5 +1,5 @@
-import json
-from flask import Blueprint, request
+from flask import Blueprint, request, json
+from flask.wrappers import Response
 from ..capsule.app import application as cmd_app_capsule
 from ..capsule.query import Query
 from ..capsule.exceptions import TerminalException
@@ -48,5 +48,5 @@ def handle(app=None, queries=None):
     except TerminalException as e:
         return e.to_response()
 
-    return json.dumps(response, ensure_ascii=False)
+    return response if isinstance(response, Response) else json.dumps(response, ensure_ascii=False)
 

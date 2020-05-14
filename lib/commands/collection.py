@@ -1,7 +1,7 @@
-import json
+from flask import json
 from ..capsule.resource import Resource
 
 
 def layouts():
     contents = Resource.load('collections/layouts.json')
-    return json.loads(contents)
+    return json.dumps(contents)

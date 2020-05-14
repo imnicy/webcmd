@@ -5,9 +5,12 @@ from ..capsule.exceptions import ValidationError, TerminalException
 from ..capsule.mark import get_mark
 
 
-def validate(document, scheme=None, messages=None):
-    if isinstance(document, LocalProxy):
-        document = {**document.values.to_dict(), **document.json}
+def validate(document, scheme=None, messages=None, extra=None):
+    if document is not None and isinstance(document, LocalProxy):
+        document = {**(document.values.to_dict() or {}), **(document.json or {})}
+
+    if extra is not None and isinstance(extra, dict):
+        document.update(extra)
 
     result, document_or_error = Validator(scheme).validate(document, to_bool=False, messages=messages)
 
@@ -30,8 +33,7 @@ def get_query():
     """
     query = g.get('query', None)
 
-    if get_mark('process') == 'run':
-        if query is None:
-            raise TerminalException('query is invalid on local proxy.')
+    if query is None and get_mark('process') == 'run':
+        raise TerminalException('query is invalid on local proxy.')
 
     return query

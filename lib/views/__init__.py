@@ -4,7 +4,8 @@ from helper import import_module_from_string
 
 loaded_views = [
     '.api.api_blue',
-    '.terminal.terminal_blue'
+    '.terminal.terminal_blue',
+    '.errors.errors_blue'
 ]
 
 

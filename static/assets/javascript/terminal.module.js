@@ -1362,6 +1362,10 @@ terminal.directive('terminal', function() {
                     ];
                 }
 
+                if(error_code === 3404) {
+                    m = "☉ Resource not found with message: "+error_message;
+                }
+
                 if(error_code === 5403) {
                     m = [
                         $scope.ui.divider("-"),
@@ -1375,6 +1379,19 @@ terminal.directive('terminal', function() {
                         $scope.ui.dye("☉ The command you output is wrong or not allowed", 'red'),
                         "You can try this command learn how to use the system:",
                         "<cmd>help app cmd</cmd>"
+                    ];
+                }
+
+                if(error_code === 3403) {
+                    //
+                }
+
+                if(error_code === 2403) {
+                    LocalStorageService.remove('access_token');
+
+                    m = [
+                        $scope.ui.divider("-"),
+                        $scope.ui.dye("☉ Your login session has been discarded. Please login again: <cmd>user signin</cmd>", 'red')
                     ];
                 }
 
@@ -2117,9 +2134,10 @@ terminal.directive('terminal', function() {
              * @returns {$http}
              */
             $scope.http.api = function(data, config) {
-                if($scope.term.preQuery) {
+                var command = "";
+                if ($scope.term.preQuery) {
                     app = $scope.term.preQuery;
-                    command = $scope.query.replace($scope.term.preQuery+' ','');
+                    command = $scope.query.replace($scope.term.preQuery + ' ', '');
                 } else {
                     qs = $scope.query.split(' ');
                     app = qs.shift();
@@ -2158,17 +2176,21 @@ terminal.directive('terminal', function() {
             $scope.http._get = function(type, url, data, config) {
                 url = '/api/v1/apps' + url;
 
-                var csrfToken = {'X-CSRF-TOKEN' : terminal_data.token};
+                var _headers = {
+                    'X-CSRF-TOKEN' : terminal_data.token,
+                    'Authorization' : 'Bearer ' + window.localStorage['access_token']
+                };
 
                 if (config === undefined) {
-                    config = {headers : csrfToken};
+                    config = {headers : _headers};
                 }
                 else {
                     if (config.headers !== undefined) {
-                        config.headers['X-CSRF-TOKEN'] = csrfToken['X-CSRF-TOKEN'];
+                        config.headers['X-CSRF-TOKEN'] = _headers['X-CSRF-TOKEN'];
+                        config.headers['Authorization'] = _headers['Authorization'];
                     }
                     else {
-                        config.headers = csrfToken;
+                        config.headers = _headers;
                     }
                 }
 

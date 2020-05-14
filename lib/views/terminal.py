@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, json
+from flask_wtf import csrf
 from ..capsule.app import application as cmd_app_capsule
 from ..capsule.resource import Resource
-import json
 
 
 terminal_blue = Blueprint('terminal', __name__)
@@ -39,7 +39,7 @@ class Terminal:
                 'version': 'v0.9.3',
                 'codename': 'beta'
             },
-            'token': ''
+            'token': csrf.generate_csrf()
         }
         return json.dumps(data, ensure_ascii=False)
 

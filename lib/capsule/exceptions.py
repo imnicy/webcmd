@@ -36,3 +36,15 @@ class InvalidArgument(TerminalException):
 
 class InvalidQueries(TerminalException):
     SCRIPT = '$scope.term.returnError(4403);'
+
+
+class NotFound(TerminalException):
+    SCRIPT = '$scope.term.returnError(3404);'
+
+
+class TokenExpired(TerminalException):
+    SCRIPT = '$scope.term.returnError(3403);'
+
+
+class TokenDiscarded(TerminalException):
+    SCRIPT = '$scope.term.returnError(2403);'

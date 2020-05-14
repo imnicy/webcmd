@@ -1,7 +1,7 @@
-import json
 import re
 
 from jsmin import jsmin
+from flask import json
 
 
 class Base:
@@ -29,12 +29,11 @@ class Base:
 
     def get_command(self, name=None, enable=True):
         commands = self.get_enable_commands() if enable else self.get_commands(True)
-
         for found in commands:
-            if name is not None or found.name == name or name in found.aliases:
+            if name is not None and (found.name == name or name in found.aliases):
                 return found
 
-        return False
+        return None
 
     def get_commands(self, refresh=False):
         if len(self.all_commands) == 0 or refresh:

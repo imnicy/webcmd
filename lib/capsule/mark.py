@@ -12,7 +12,7 @@ example:
 {'process.command_run': callback}
 """
 listeners = {
-    'process.run': process_run
+    # 'process.run': process_run
 }
 
 

@@ -68,7 +68,7 @@ app._validateUpdate = function () {
 
 app.signin = function () {
 
-    if (localStorageService.get('cmd_accessToken')) {
+    if (localStorageService.get('access_token')) {
         return $scope.ui.addError('You are already logged in. You can logout by using <cmd>user logout</cmd> cmd.');
     }
 
@@ -88,9 +88,13 @@ app.signin = function () {
                     $scope.ui.addInfo('Please wait... Authenticating new session...');
 
                     $timeout(function () {
-                        $scope.http.api({email_or_username: username_or_email, password: password}).success(function (data) {
+                        $scope.http.api({email_or_username: username_or_email, password: password}).success(function (data, status, headers) {
                             if (data.status) {
                                 $scope.ui.addWarning('You are now logged in..', '🌟');
+                                var _token = headers('Authorization');
+                                if (_token !== null) {
+                                    localStorageService.add('access_token', _token);
+                                }
                             } else if (data.error_text !== undefined) {
                                 $scope.ui.addError(data.error_text);
                             } else {
@@ -146,42 +150,11 @@ app.resend = function (email) {
             }, 400);
         }
     });
-
 };
 
 app.show = function (username) {
 
-    if (username === undefined || username === 'show') {
-        username = '';
-        $scope.ui.prompt('Enter an username to show profile (type \'me\' for your profile)', false, false, function (resp) {
-            username = resp;
-            $scope.ui.addWarning('Username: ' + resp);
-            $scope.ui.addInfo('Setting up XMLHttpRequest..');
-
-            $timeout(function () {
-                $scope.ui.addInfo('Please wait... Sending request to imnicy.com servers...');
-
-                $scope.http.api({username: username}).success(function (data) {
-                    if (data.status) {
-                        $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('👤PROFILE:' + username || ''), $scope.ui.br()], undefined, function () {
-                            angular.forEach(data.user_data.current_user, function (value, key) {
-                                if (value) {
-                                    $scope.ui.addInfo(key.toUpperCase().replace('_', ' ') + ': ' + value, undefined, '<span style=\'color:white\'>-></span>');
-                                }
-                            });
-
-                            $scope.ui.addLine($scope.ui.br());
-                            $scope.ui.addWarning('Done: Parse user profile');
-                        });
-                    } else if (data.error_text !== undefined) {
-                        $scope.ui.addError(data.error_text);
-                    } else {
-                        $scope.ui.addError('Something went wrong.');
-                    }
-                });
-            }, 400);
-        });
-    } else {
+    var show_profile = function(username) {
         $scope.ui.addInfo('Setting up XMLHttpRequest..');
 
         $timeout(function () {
@@ -190,7 +163,7 @@ app.show = function (username) {
             $scope.http.api({username: username}).success(function (data) {
                 if (data.status) {
                     $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('👤PROFILE:' + username || ''), $scope.ui.br()], undefined, function () {
-                        angular.forEach(data.user_data.current_user, function (value, key) {
+                        angular.forEach(data.user_data, function (value, key) {
                             if (value) {
                                 $scope.ui.addInfo(key.toUpperCase().replace('_', ' ') + ': ' + value, undefined, '<span style=\'color:white\'>-></span>');
                             }
@@ -199,14 +172,25 @@ app.show = function (username) {
                         $scope.ui.addLine($scope.ui.br());
                         $scope.ui.addWarning('Done: Parse user profile');
                     });
-
                 } else if (data.error_text !== undefined) {
                     $scope.ui.addError(data.error_text);
                 } else {
-                    $scope.ui.addError('Something went wrong. Maybe account is already activated.');
+                    $scope.ui.addError('Something went wrong.');
                 }
             });
         }, 400);
+    };
+
+    if (username === undefined || username === "") {
+        username = '';
+        $scope.ui.prompt('Enter an username to show profile (type \'me\' for your profile)', false, false, function (resp) {
+            username = resp;
+            $scope.ui.addWarning('Username: ' + resp);
+            show_profile(username)
+        });
+    }
+    else {
+        show_profile(username)
     }
 };
 
@@ -521,7 +505,7 @@ app._ask_password_change = function () {
 };
 
 app.update = function () {
-    if (!localStorageService.get('cmd_accessToken')) {
+    if (!localStorageService.get('access_token')) {
         return $scope.ui.addLogin();
     }
 
@@ -562,8 +546,7 @@ app.update = function () {
 app.signout = function () {
     $scope.http.api().success(function (data) {
         if (data.status) {
-            localStorageService.set('cmd_accessToken', data.access_token);
-            localStorageService.set('uid', data.uid);
+            localStorageService.remove('access_token');
             $scope.ui.addWarning('You are now logged out..');
         }
     });

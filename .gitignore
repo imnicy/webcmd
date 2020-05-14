@@ -2,8 +2,6 @@
 Pipfile.lock
 #dotenv
 .env
-storage/uploads/*
-storage/logs/*
 #pycharm
 .idea
 # python
