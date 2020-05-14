@@ -1387,7 +1387,7 @@ terminal.directive('terminal', function() {
                 }
 
                 if(error_code === 2403) {
-                    LocalStorageService.remove('access_token');
+                    localStorageService.remove('access_token');
 
                     m = [
                         $scope.ui.divider("-"),
@@ -2131,7 +2131,7 @@ terminal.directive('terminal', function() {
             /**
              * This method get data from server
              *
-             * @returns {$http}
+             * @returns {$scope.http.proxy}
              */
             $scope.http.api = function(data, config) {
                 var command = "";
@@ -2148,7 +2148,38 @@ terminal.directive('terminal', function() {
                     command = 'index';
                 }
 
-                return $scope.http._get('post', '/'+app+'/'+command, data, config);
+                return $scope.http.proxy.handle(
+                    $scope.http._get('post', '/'+app+'/'+command, data, config)
+                );
+            };
+
+            /**
+             * A http request proxy
+             *
+             * @type {{handle: (function(*): $scope.http.proxy), then: then, success: success}}
+             */
+            $scope.http.proxy = {
+                isf: function(c) {
+                    if (c !== undefined && typeof c == "function") {return c}
+                    return function(){}
+                },
+                handle: function(request) {
+                    var _this = this;
+                    request.success(function(data, status, headers) {
+                        _this.isf(_this.sc)(data, status, headers);
+                    }).then(function(response) {
+                        var data = response.data;
+                        if (data.status === false) {
+                            if (data.script !== undefined && data.script !== "") {
+                                eval(data.script)
+                            }
+                        }
+                        _this.isf(_this.tc)(response);
+                    });
+                    return _this;
+                },
+                then: function(_c){var _this=this;_this.tc=_c;return _this},
+                success: function(_c) {var _this=this;_this.sc=_c;return _this;}
             };
 
 

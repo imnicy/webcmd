@@ -23,12 +23,14 @@ def handle_auth_error(e):
 
 @jwt.expired_token_loader
 def handle_expired_error(e):
-    identify = e.get(current_app.config.get('JWT_IDENTITY_CLAIM', 'identify'), None)
-    response = TokenExpired('access token expired.').to_response()
+    try:
+        identify = e.get(current_app.config.get('JWT_IDENTITY_CLAIM', 'identify'), None)
+        response = TokenExpired('access token expired.').to_response()
+        response.headers['Authorization'] = create_access_token(identify)
 
-    response.headers['Authorization'] = create_access_token(identify)
-
-    return response
+        return response
+    except Exception as be:
+        return TokenDiscarded(str(be)).to_response()
 
 
 @jwt.invalid_token_loader
