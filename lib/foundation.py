@@ -1,6 +1,4 @@
-from flask import current_app
 from .capsule.app import application as cmd_app_capsule
-from .models.auth import User
 
 
 def boot():

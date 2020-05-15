@@ -1,4 +1,6 @@
-from flask import Blueprint, current_app
+import helper
+
+from flask import Blueprint, g, json
 from flask_jwt_extended import create_access_token
 from providers.jwt import jwt
 from ..capsule.exceptions import TokenDiscarded, TokenExpired, AppNotFound
@@ -24,9 +26,24 @@ def handle_auth_error(e):
 @jwt.expired_token_loader
 def handle_expired_error(e):
     try:
-        identify = e.get(current_app.config.get('JWT_IDENTITY_CLAIM', 'identify'), None)
+        identify = e.get(helper.config('JWT_IDENTITY_CLAIM', 'identify'), None)
+        claims = e.get(helper.config('JWT_USER_CLAIMS', {}))
+
         response = TokenExpired('access token expired.').to_response()
-        response.headers['Authorization'] = create_access_token(identify)
+        response.headers['Authorization'] = create_access_token(identify, user_claims=claims)
+
+        query = g.get('query', None)
+
+        if query is not None:
+            expired_data = json.loads(response.get_data())
+
+            pre_script = expired_data.get('script', '')
+            sub_script = '$scope.term.retry(\'%s\', \'%s\', %s)' \
+                         % (query.app, query.command, '[\'' + '\',\''.join(query.arguments) + '\']')
+
+            expired_data['script'] = pre_script + sub_script
+
+            response.set_data(json.dumps(expired_data))
 
         return response
     except Exception as be:

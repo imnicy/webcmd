@@ -56,7 +56,13 @@ class Config:
         'handlers': ['wsgi']
     }
 
-    JWT_SECRET_KEY = 'webcmd_token'
+    JWT_SECRET_KEY = 'ZVhqY5643bQdrr8d5Bt3'
+    JWT_ACCESS_TOKEN_EXPIRES = 20
+    JWT_REFRESH_TOKEN_EXPIRES = 60*60*24*30
+    JWT_HEADER_NAME = 'Authorization'
+    JWT_HEADER_TYPE = 'Bearer'
+    JWT_IDENTITY_CLAIM = 'identify'
+    JWT_USER_CLAIMS = 'user_claims'
 
     @staticmethod
     def bootstrap():

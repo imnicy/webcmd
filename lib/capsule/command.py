@@ -84,7 +84,7 @@ class Command:
             return True
         return True
 
-    def to_array(self):
+    def to_dict(self):
         arguments = self.arguments if self.arguments is not None else []
 
         data = {

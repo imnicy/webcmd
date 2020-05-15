@@ -58,11 +58,11 @@ class App:
         """
         return self.apps
 
-    def __apps_to_array(self):
+    def __apps_to_dict(self):
         apps = self.get_apps()
         data = []
         for app_name, app in apps.items():
-            data.append(app.to_array())
+            data.append(app.to_dict())
         return data
 
     def __is_hidden(self, name):
@@ -85,7 +85,7 @@ class App:
         if from_command and found_app:
             return found_app
 
-        raise False
+        return False
 
     def __get_from_command_or_app(self, name):
         apps = self.get_apps()
@@ -97,7 +97,7 @@ class App:
         return False
 
     def pull(self):
-        apps = self.__apps_to_array()
+        apps = self.__apps_to_dict()
         return {
             'status': True,
             'apps': list(apps)
@@ -113,7 +113,7 @@ class App:
         """
         return {
             'status': True,
-            'app': app.to_array(),
+            'app': app.to_dict(),
             'script': app.get_script(),
             'queries': queries,
             'command': command.name

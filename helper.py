@@ -16,6 +16,17 @@ def env(name, default=None, force_default=False):
     return setting_env(name, default=default, force_default=force_default)
 
 
+def config(name, default=None):
+    if name is not None:
+        if isinstance(name, str):
+            return current_app.config.get(name, default)
+        elif isinstance(name, dict):
+            for _key, _val in name.items():
+                current_app.config[_key] = _val
+
+    return default
+
+
 def log(level, msg, *args, **kwargs):
     current_app.logger.log(level, msg, *args, **kwargs)
 

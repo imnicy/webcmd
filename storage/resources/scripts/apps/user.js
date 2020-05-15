@@ -62,6 +62,8 @@ app._validateUpdate = function () {
         errors_arr.push('Username is too short');
     }
 
+    $scope.http.api();
+
     return errors_arr;
 };
 
@@ -162,7 +164,7 @@ app.show = function (username) {
 
             $scope.http.api({username: username}).success(function (data) {
                 if (data.status) {
-                    $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('👤PROFILE:' + username || ''), $scope.ui.br()], undefined, function () {
+                    $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('👤PROFILE:' + username || ''), $scope.ui.br()], function () {
                         angular.forEach(data.user_data, function (value, key) {
                             if (value) {
                                 $scope.ui.addInfo(key.toUpperCase().replace('_', ' ') + ': ' + value, undefined, '<span style=\'color:white\'>-></span>');
@@ -267,15 +269,11 @@ app.signup = function () {
                             $scope.ui.addWarning('Entered password confirmation: ' + $scope.helpers.repeater('*', (resp ? resp.length : 8)));
 
                             // --
-
                             $scope.ui.addInfo('Running client-side validations, please wait..');
-
                             has_signup_errors = app._validateSignup();
 
                             if (has_signup_errors.length > 0) {
-
                                 $scope.ui.addError('We have problems: ' + has_signup_errors.join(' & '));
-
                                 return false;
                             }
 
@@ -298,15 +296,11 @@ app.signup = function () {
 
                                     $scope.http.api(data_to_send).success(function (data) {
                                         if (data.status) {
-
                                             //app.welcome();
-
                                         } else if (data.error_text !== undefined) {
-
                                             $scope.ui.add($scope.ui.divider('*'), function () {
                                                 $scope.ui.addError('We have problems: ' + data.error_text);
                                             });
-
                                         } else {
                                             $scope.ui.add($scope.ui.divider('*'), function () {
                                                 $scope.ui.addError('Authentication failed, please check your email/username and password.');
@@ -443,34 +437,15 @@ app._ask_more_details = function () {
                             $scope.tempUserData.webpage = resp;
                             $scope.ui.addWarning('Your webpage: ' + resp);
 
-                            $scope.ui.prompt('Twitter username', false, $scope.tempUserData.twitter_username, function (resp) {
+                            $scope.ui.prompt('Github username', false, $scope.tempUserData.github_username, function (resp) {
+                                $scope.tempUserData.github_username = resp;
+                                $scope.ui.addWarning('Your Github username: ' + resp);
 
-                                $scope.tempUserData.twitter_username = resp;
-                                $scope.ui.addWarning('Your Twitter username: ' + resp);
+                                $scope.ui.prompt('Want to tag yourself (Ex: developer, nodejs, nerd, big data, ..)', false, $scope.tempUserData.tags, function (resp) {
+                                    $scope.tempUserData.tags = resp;
+                                    $scope.ui.addWarning('Tags: ' + resp);
 
-                                $scope.ui.prompt('Facebook username', false, $scope.tempUserData.facebook_username, function (resp) {
-
-                                    $scope.tempUserData.facebook_username = resp;
-                                    $scope.ui.addWarning('Your Facebook username: ' + resp);
-
-                                    $scope.ui.prompt('Github username', false, $scope.tempUserData.github_username, function (resp) {
-
-                                        $scope.tempUserData.github_username = resp;
-                                        $scope.ui.addWarning('Your Github username: ' + resp);
-
-                                        $scope.ui.prompt('Bio', false, $scope.tempUserData.bio, function (resp) {
-
-                                            $scope.tempUserData.bio = resp;
-                                            $scope.ui.addWarning('Your bio: ' + resp);
-
-                                            $scope.ui.prompt('Want to tag yourself (Ex: developer, nodejs, nerd, big data, ..)', false, $scope.tempUserData.tags, function (resp) {
-                                                $scope.tempUserData.tags = resp;
-                                                $scope.ui.addWarning('Tags: ' + resp);
-
-                                                app._ask_password_change();
-                                            });
-                                        });
-                                    });
+                                    app._ask_password_change();
                                 });
                             });
                         });
@@ -511,30 +486,17 @@ app.update = function () {
 
     $scope.ui.add([$scope.ui.br(), $scope.ui.listHeader('📝UPDATE'), $scope.ui.br()], function () {
 
-        $scope.http.api().then(function (response_data) {
+        $scope.http.api({}, undefined, 'user', 'show me').then(function (response_data) {
             data = response_data.data;
 
             if (data.status === true) {
 
-                $scope.tempUserData = data.user_data.current_user;
-                $scope.ui.prompt('Email address', false, $scope.tempUserData.email, function (resp) {
+                $scope.tempUserData = data.user_data;
+                $scope.ui.prompt('Full name', false, $scope.tempUserData.fullname, function (resp) {
+                    $scope.tempUserData.fullname = resp;
+                    $scope.ui.addWarning('Entered name: ' + resp);
 
-                    $scope.tempUserData.email = resp;
-                    $scope.ui.addWarning('Entered email address: ' + resp);
-
-                    $scope.ui.prompt('Username (min 3 chars)', false, $scope.tempUserData.username, function (resp) {
-
-                        $scope.tempUserData.username = resp;
-                        $scope.ui.addWarning('Entered username: ' + resp);
-
-                        $scope.ui.prompt('Full name', false, $scope.tempUserData.fullname, function (resp) {
-
-                            $scope.tempUserData.fullname = resp;
-                            $scope.ui.addWarning('Entered name: ' + resp);
-
-                            app._ask_more_details();
-                        });
-                    });
+                    app._ask_more_details();
                 });
             } else {
                 return $scope.ui.addError('User not found.');

@@ -68,7 +68,7 @@ class Base:
         for command in commands:
             script = ''
             command.with_init(True)
-            data = command.to_array()
+            data = command.to_dict()
             script += '%s:{' % data.get('name')
 
             for name, item in data.items():
@@ -117,13 +117,13 @@ class Base:
     def get_script(self):
         return self.__build_script()
 
-    def __commands_to_array(self):
-        to_array = []
+    def __commands_to_dict(self):
+        to_dict = []
         commands = self.get_enable_commands()
 
         for command in commands:
-            to_array.append(command.to_array())
-        return to_array
+            to_dict.append(command.to_dict())
+        return to_dict
 
     def __get_commands_structure(self, commands):
         structure = {}
@@ -140,8 +140,8 @@ class Base:
 
         return structure
 
-    def to_array(self):
-        commands = self.__commands_to_array()
+    def to_dict(self):
+        commands = self.__commands_to_dict()
 
         return {
             'aliases': self.aliases,

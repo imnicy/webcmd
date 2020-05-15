@@ -743,7 +743,6 @@ terminal.directive('terminal', function() {
                         e.preventDefault();
                         return;
                     }
-
                 }
 
                 if($scope.queryIndex !== $scope.queryHistory.length - 1 && e.keyCode !== 38 && e.keyCode !== 40 && e.keyCode !== 13) {
@@ -1109,9 +1108,9 @@ terminal.directive('terminal', function() {
                     $scope.http.run(scq).then(function(response){
                         if(response.status === 200) {
                             var data = response.data;
-                            var app_name = $scope.term.findCachedApp(data.app.name);
+                            var app_name = $scope.term.findCachedApp(data.app);
 
-                            if(!app_name) {
+                            if(! app_name) {
                                 /* Load app script */
                                 eval(data.script);
 
@@ -1278,11 +1277,12 @@ terminal.directive('terminal', function() {
              */
             $scope.term.runCmd = function(o) {
                 var def_opts = {
+                    app: null,
                     query: null,
                     remove_pre_query: false,
                     return_to_old_query: false,
                     add_to_history: true,
-                    queries: null
+                    arguments: null
                 };
 
                 var opts = $.extend({}, def_opts, o);
@@ -1297,8 +1297,8 @@ terminal.directive('terminal', function() {
                     console.log('Removed pre query');
                 }
 
-                if(opts.queries != null && opts.queries.length > 0) {
-                    qr += ' -' + opts.queries.join(' -');
+                if(opts.arguments != null && opts.arguments.length > 0) {
+                    qr += ' ' + opts.arguments.join(' ');
                 }
 
                 $scope.queryHistory[$scope.queryIndex] = qr;
@@ -1326,6 +1326,18 @@ terminal.directive('terminal', function() {
                 if($scope.term.preQuery && $scope.term.preQuery.length > 0) {
                     $scope.queryHistory[$scope.queryIndex] = $scope.term.preQuery + ' ' + $scope.queryHistory[$scope.queryIndex];
                     $scope.term.preQuery = '';
+                }
+            };
+
+
+            $scope.term.retry = function(app, command, arguments) {
+                if ($scope.term.isRetry === undefined || $scope.term.isRetry === false) {
+                    $scope.term.isRetry = true;
+                    $scope.term.runCmd({app: app, query: command, arguments: arguments, remove_pre_query:true});
+                }
+                else {
+                    $scope.ui.addError("Some unknown errors have occurred. You need to refresh the " +
+                        "page before you can use it again.");
                 }
             };
 
@@ -1383,7 +1395,8 @@ terminal.directive('terminal', function() {
                 }
 
                 if(error_code === 3403) {
-                    //
+                    m = [];
+                    $scope.ui.addInfo("Access token already refreshed. just retry ...", 'yellow', '🔔');
                 }
 
                 if(error_code === 2403) {
@@ -1391,7 +1404,7 @@ terminal.directive('terminal', function() {
 
                     m = [
                         $scope.ui.divider("-"),
-                        $scope.ui.dye("☉ Your login session has been discarded. Please login again: <cmd>user signin</cmd>", 'red')
+                        $scope.ui.dye("☉ Your login session has been discarded. Please login again: <cmd>user login</cmd>", 'red')
                     ];
                 }
 
@@ -1863,7 +1876,7 @@ terminal.directive('terminal', function() {
              * This method adds multiple lines to terminal.
              * If terminal is busy, it'll retry in 300 ms
              *
-             * @param obj {string} String or string array
+             * @param obj {*[]} String or string array
              * @param callback
              * @param tms
              * @return {boolean}
@@ -1969,7 +1982,7 @@ terminal.directive('terminal', function() {
 
                     $scope.term.promptCb = function(){
                         resp = $scope.term.promptAnswer;
-                        if((resp !== undefined && resp.toLowerCase() == 'y') || ((resp == '' || resp === undefined) && easy === true)) {
+                        if((resp !== undefined && resp.toLowerCase() === 'y') || ((resp === '' || resp === undefined) && easy === true)) {
                             return $scope.term._promptCb(true);
                         } else {
                             return $scope.term._promptCb(false);
@@ -2133,15 +2146,17 @@ terminal.directive('terminal', function() {
              *
              * @returns {$scope.http.proxy}
              */
-            $scope.http.api = function(data, config) {
-                var command = "";
-                if ($scope.term.preQuery) {
-                    app = $scope.term.preQuery;
-                    command = $scope.query.replace($scope.term.preQuery + ' ', '');
-                } else {
-                    qs = $scope.query.split(' ');
-                    app = qs.shift();
-                    command = qs.join('/');
+            $scope.http.api = function(data, config, app, command) {
+
+                if (app === undefined || app === "" || app === null) {
+                    if ($scope.term.preQuery) {
+                        app = $scope.term.preQuery;
+                        command = $scope.query.replace($scope.term.preQuery + ' ', '');
+                    } else {
+                        qs = $scope.query.split(' ');
+                        app = qs.shift();
+                        command = qs.join('/');
+                    }
                 }
 
                 if (command === "" || command === undefined) {
@@ -2163,18 +2178,26 @@ terminal.directive('terminal', function() {
                     if (c !== undefined && typeof c == "function") {return c}
                     return function(){}
                 },
-                handle: function(request) {
+                handle: function(_rq) {
                     var _this = this;
-                    request.success(function(data, status, headers) {
-                        _this.isf(_this.sc)(data, status, headers);
-                    }).then(function(response) {
-                        var data = response.data;
-                        if (data.status === false) {
-                            if (data.script !== undefined && data.script !== "") {
-                                eval(data.script)
+                    _rq.success(function(_dt, _st, _hd) {
+                        _this.isf(_this.sc)(_dt, _st, _hd);
+                    }).then(function(_re) {
+                        var _d = _re.data;
+                        if(_d.status === false) {
+                            if (_d.script !== undefined && _d.script !== null) {
+                                eval(_d.script);
                             }
                         }
-                        _this.isf(_this.tc)(response);
+                        else{
+                            $scope.term.isRetry = false;
+                        }
+                        var _ac = _re.headers('Authorization');
+                        if(_ac !== undefined && _ac !== null) {
+                            localStorageService.remove('access_token');
+                            localStorageService.add('access_token', _ac);
+                        }
+                        _this.isf(_this.tc)(_re);
                     });
                     return _this;
                 },
@@ -2209,7 +2232,7 @@ terminal.directive('terminal', function() {
 
                 var _headers = {
                     'X-CSRF-TOKEN' : terminal_data.token,
-                    'Authorization' : 'Bearer ' + window.localStorage['access_token']
+                    'Authorization' : 'Bearer ' + localStorageService.get('access_token')
                 };
 
                 if (config === undefined) {

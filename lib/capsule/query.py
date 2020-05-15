@@ -1,6 +1,6 @@
 import helper
 
-from flask import g, request
+from flask import g
 from .exceptions import InvalidQueries
 from .app import application
 from .exceptions import AppNotFound, CommandNotFound, InvalidArgument
@@ -35,6 +35,17 @@ class Query:
         logging query run records
         """
         helper.debug('run command with queries: %s' % queries)
+
+    def to_dict(self):
+        """
+        set query info to dict
+        :return: dict
+        """
+        return {
+            'app': self.app,
+            'command': self.command,
+            'arguments': self.arguments
+        }
 
     def parse(self, queries):
         joined = [] if queries is None else queries.strip().split(' ')
