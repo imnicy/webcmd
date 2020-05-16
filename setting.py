@@ -1,5 +1,4 @@
 import os
-from dotenv import find_dotenv, load_dotenv
 
 
 def env(name, default=None, force_default=False):

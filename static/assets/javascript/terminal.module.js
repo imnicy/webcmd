@@ -1286,7 +1286,7 @@ terminal.directive('terminal', function() {
                 };
 
                 var opts = $.extend({}, def_opts, o);
-                var qr = opts.query;
+                var qr = opts.app + ' ' + opts.query;
 
                 if(opts.return_to_old_query) {
                     $scope.term.terminatePreQuery();
@@ -1333,7 +1333,7 @@ terminal.directive('terminal', function() {
             $scope.term.retry = function(app, command, arguments) {
                 if ($scope.term.isRetry === undefined || $scope.term.isRetry === false) {
                     $scope.term.isRetry = true;
-                    $scope.term.runCmd({app: app, query: command, arguments: arguments, remove_pre_query:true});
+                    $scope.term.runCmd({app: app, query: command, arguments: arguments, remove_pre_query:true, add_to_history: false});
                 }
                 else {
                     $scope.ui.addError("Some unknown errors have occurred. You need to refresh the " +
@@ -1351,7 +1351,7 @@ terminal.directive('terminal', function() {
                 var m = 'Something went wrong, please try again..';
 
                 if(error_code === 302) {
-                    m = "☉ Validation failed with error message: "+error_message;
+                    m = "☉ Validation failed.";
                 }
 
                 if(error_code === 404) {
@@ -1375,7 +1375,7 @@ terminal.directive('terminal', function() {
                 }
 
                 if(error_code === 3404) {
-                    m = "☉ Resource not found with message: "+error_message;
+                    m = "☉ Resource not found.";
                 }
 
                 if(error_code === 5403) {
