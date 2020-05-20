@@ -29,7 +29,7 @@ def handle_expired_error(e):
         identify = e.get(helper.config('JWT_IDENTITY_CLAIM', 'identify'), None)
         claims = e.get(helper.config('JWT_USER_CLAIMS', {}))
 
-        response = TokenExpired('access token expired.').to_response()
+        response = TokenExpired('Access token expired.').to_response()
         response.headers['Authorization'] = create_access_token(identify, user_claims=claims)
 
         query = g.get('query', None)

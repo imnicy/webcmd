@@ -534,9 +534,10 @@ terminal.directive('terminal', function() {
             });
 
             $scope.$watchCollection('queryHistory', function(){
-                if($scope.term.preQuery && $scope.queryHistory[$scope.queryIndex].indexOf($scope.term.preQuery + ' ') === 0) {
+                var foundQueryIndex = $scope.queryHistory[$scope.queryIndex];
+                if($scope.term.preQuery && foundQueryIndex !== undefined && foundQueryIndex.indexOf($scope.term.preQuery + ' ') === 0) {
                     $scope.term.preQuery = '';
-                    //$scope.queryHistory[$scope.queryIndex] = $scope.queryHistory[$scope.queryIndex].replace($scope.term.preQuery + ' ', '');
+                    $scope.queryHistory[$scope.queryIndex] = $scope.queryHistory[$scope.queryIndex].replace($scope.term.preQuery + ' ', '');
                 }
             });
 
@@ -747,8 +748,10 @@ terminal.directive('terminal', function() {
 
                 if($scope.queryIndex !== $scope.queryHistory.length - 1 && e.keyCode !== 38 && e.keyCode !== 40 && e.keyCode !== 13) {
                     var fnd = $scope.queryHistory[$scope.queryIndex];
-                    $scope.queryIndex = $scope.queryHistory.length - 1;
-                    $scope.queryHistory[$scope.queryIndex] = fnd;
+                    if (fnd !== undefined) {
+                        $scope.queryIndex = $scope.queryHistory.length - 1;
+                        $scope.queryHistory[$scope.queryIndex] = fnd;
+                    }
                 }
 
                 switch (e.keyCode) {
@@ -951,7 +954,13 @@ terminal.directive('terminal', function() {
                         $scope.queryIndex = ($scope.queryIndex < $scope.queryHistory.length - 1) ? ($scope.queryIndex + 1) : $scope.queryHistory.length - 1;
                     }
 
-                    if($scope.term.preQuery && $scope.term.preQuery !== '' && $scope.queryHistory[$scope.queryIndex].indexOf($scope.term.preQuery + ' ')===0) {
+                    var foundQueries = $scope.queryHistory[$scope.queryIndex];
+
+                    if (foundQueries === undefined || foundQueries === null) {
+                        return ;
+                    }
+
+                    if($scope.term.preQuery && $scope.term.preQuery !== '' && foundQueries.indexOf($scope.term.preQuery + ' ')===0) {
                         $scope.queryHistory[$scope.queryIndex] = $scope.queryHistory[$scope.queryIndex].replace($scope.term.preQuery + ' ', '');
                     }
                 },1);
@@ -1029,7 +1038,7 @@ terminal.directive('terminal', function() {
              * This method gets current command and forwards it to the /api/run method
              * via http get request. API returns a script or empty response.
              *
-             * @return {void}
+             * @return {*}
              */
             $scope.term.runQuery = function(ignore_pre_query, cb) {
 
@@ -1056,6 +1065,7 @@ terminal.directive('terminal', function() {
                 }
 
                 var split_query = query.split(" ");
+                var app_from_query = false;
 
                 if(!ignore_pre_query && $scope.term.preQuery) {
 
@@ -1069,7 +1079,7 @@ terminal.directive('terminal', function() {
                         return;
                     }
 
-                    var command = $scope.term.preQuery;
+                    app_from_query = $scope.term.preQuery;
 
                 } else {
 
@@ -1079,13 +1089,12 @@ terminal.directive('terminal', function() {
                         return;
                     }
 
-                    command = split_query[0];
-
+                    app_from_query = split_query[0];
                     $scope.term.preQuery = '';
                 }
 
 
-                var app_name = $scope.term.findCachedApp(command);
+                var app_name = $scope.term.findCachedApp(app_from_query);
 
                 /* ..not found? get it from webservice */
                 if(!app_name) {
@@ -1117,7 +1126,7 @@ terminal.directive('terminal', function() {
                                 $timeout(function(){
                                     if(data.app !== undefined && data.app !== null) {
 
-                                        var aliases_not_starting = !!(data.app.aliases && data.app.aliases.indexOf(command) === -1);
+                                        var aliases_not_starting = !!(data.app.aliases && data.app.aliases.indexOf(app_from_query) === -1);
 
                                         if($scope.query.toLowerCase().indexOf(data.app.name) !== 0 && aliases_not_starting && (!$scope.term.preQuery || $scope.term.preQuery === '')) {
                                             $scope.ui.add($scope.ui.br(), function(){
@@ -1137,7 +1146,7 @@ terminal.directive('terminal', function() {
                                     }
                                 },500);
                             } else {
-                                $scope.queryHistory[$scope.queryIndex] = app_name + " " + scq, ignore_pre_query;
+                                $scope.queryHistory[$scope.queryIndex] = app_name + " " + scq;
                                 return $scope.term.runQuery(false, function(status) {
 
                                 });
@@ -1148,14 +1157,17 @@ terminal.directive('terminal', function() {
                     });
                 } else {
                     /* Run the query */
-
                     $scope.term.runApp(app_name, ignore_pre_query);
-
                 }
 
                 $timeout(function(){
+
                     $scope.queryIndex++;
-                    $scope.queryHistory[$scope.queryIndex] = '';
+
+                    if ($scope.queryIndex === $scope.queryHistory.length && $scope.queryHistory[$scope.queryIndex-1] !== '') {
+                        $scope.queryHistory[$scope.queryIndex] = '';
+                    }
+
                     localStorageService.set('queryHistory', $scope.queryHistory);
                     localStorageService.set('queryIndex', $scope.queryIndex);
                 },1);
@@ -1316,9 +1328,7 @@ terminal.directive('terminal', function() {
 
                 if(!opts.add_to_history) {
                     $scope.queryHistory.pop();
-                    $timeout(function(){
-                        $scope.queryHistory.push('');
-                    },1);
+                    $scope.queryHistory.push('');
                 }
             };
 
@@ -1333,7 +1343,7 @@ terminal.directive('terminal', function() {
             $scope.term.retry = function(app, command, arguments) {
                 if ($scope.term.isRetry === undefined || $scope.term.isRetry === false) {
                     $scope.term.isRetry = true;
-                    $scope.term.runCmd({app: app, query: command, arguments: arguments, remove_pre_query:true, add_to_history: false});
+                    $scope.term.runCmd({app: app, query: command, arguments: arguments, return_to_old_query:true, remove_pre_query:true, add_to_history: false});
                 }
                 else {
                     $scope.ui.addError("Some unknown errors have occurred. You need to refresh the " +
@@ -2155,7 +2165,7 @@ terminal.directive('terminal', function() {
                     } else {
                         qs = $scope.query.split(' ');
                         app = qs.shift();
-                        command = qs.join('/');
+                        command = qs.join(' ');
                     }
                 }
 
@@ -2194,8 +2204,7 @@ terminal.directive('terminal', function() {
                         }
                         var _ac = _re.headers('Authorization');
                         if(_ac !== undefined && _ac !== null) {
-                            localStorageService.remove('access_token');
-                            localStorageService.add('access_token', _ac);
+                            localStorageService.set('access_token', _ac);
                         }
                         _this.isf(_this.tc)(_re);
                     });
