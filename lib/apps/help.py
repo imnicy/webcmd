@@ -1,6 +1,6 @@
 from .base import Base
-from ..capsule.command import Command
-from ..capsule.resource import Resource
+from lib.capsule.command import Command
+from lib.capsule.resource import Resource
 
 
 class Help(Base):

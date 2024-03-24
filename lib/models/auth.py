@@ -7,8 +7,8 @@ from functools import wraps
 from providers.db import database as db
 from providers.jwt import jwt
 from flask import g
-from ..capsule.exceptions import TokenDiscarded
-from flask_jwt_extended import verify_jwt_in_request, get_jwt_claims
+from lib.capsule.exceptions import TokenDiscarded
+from flask_jwt_extended import verify_jwt_in_request
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -195,8 +195,8 @@ def auth_required(fn):
 
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        verify_jwt_in_request()
-        user = User.identify(**get_jwt_claims())
+        jwt_headers, jwt_claims = verify_jwt_in_request()
+        user = User.identify(**jwt_claims)
 
         """
         Verify the 'identify' and 'Remember' fields in the carrier 

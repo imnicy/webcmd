@@ -3,27 +3,12 @@ from cerberus import Validator as CerberusValidator
 
 class Validator:
 
-    """
-    cerberus validator capsule
-    pipenv install cerberus
-    """
     _create_validator_class = CerberusValidator
 
     def __init__(self, schema=None):
-        """
-        create cerberus validator object
-        :param schema:
-        """
         self._validator = self._create_validator_class(schema, allow_unknown=True)
 
     def validate(self, document=None, to_bool=True, messages=None):
-        """
-        validate document data via validator
-        :param messages: dict
-        :param to_bool: bool
-        :param document: data
-        :return: Bool
-        """
         if document is None or not isinstance(document, dict):
             document = {}
 

@@ -1,5 +1,4 @@
 import re
-
 from jsmin import jsmin
 from flask import json
 
@@ -10,9 +9,10 @@ class Base:
     info = None
 
     script = None
-    author = 'ly'
+
     hidden = False
     show_on_help = False
+    author = 'ly'
     aliases = []
 
     def __init__(self):
@@ -95,14 +95,14 @@ class Base:
             script += '}'
             scripts.append(script)
 
-        return '{'+','.join(scripts)+'}'
+        return '{' + ','.join(scripts) + '}'
 
     def __build_script(self):
         if self.script is not None:
             return self.script
 
         sst = ''
-        aliases = '[\''+','.join(self.aliases)+'\']'
+        aliases = '[\'' + ','.join(self.aliases) + '\']'
         show_help_bool = 'true' if self.show_on_help else 'false'
         caching = 'false' if self.hidden else 'true'
 
@@ -123,9 +123,11 @@ class Base:
 
         for command in commands:
             to_dict.append(command.to_dict())
+
         return to_dict
 
-    def __get_commands_structure(self, commands):
+    @staticmethod
+    def __get_commands_structure(commands):
         structure = {}
 
         for command in commands:

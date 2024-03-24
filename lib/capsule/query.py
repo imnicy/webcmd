@@ -21,7 +21,7 @@ class Query:
         self.found = {
             'app': None,
             'command': None,
-            'arguments': None
+            'arguments': {}
         }
 
         """
@@ -37,10 +37,6 @@ class Query:
         helper.debug('run command with queries: %s' % queries)
 
     def to_dict(self):
-        """
-        set query info to dict
-        :return: dict
-        """
         return {
             'app': self.app,
             'command': self.command,
@@ -67,10 +63,6 @@ class Query:
         return True
 
     def get_app(self):
-        """
-        get command app object
-        :return: App
-        """
         found_app = self.found.get('app')
         if found_app is not None:
             return found_app
@@ -85,10 +77,6 @@ class Query:
         return app
 
     def get_command(self):
-        """
-        get command object
-        :return: Command
-        """
         found_command = self.found.get('command')
         if found_command is not None:
             return found_command
@@ -108,10 +96,6 @@ class Query:
         return command
 
     def get_arguments(self):
-        """
-        get arguments from queries
-        :return: dict
-        """
         found_arguments = self.found.get('arguments')
         if found_arguments is not None:
             return found_arguments
@@ -120,13 +104,16 @@ class Query:
         command = self.get_command()
         command_arguments = command.arguments
 
-        for _k, _v in enumerate(command_arguments):
-            if _v.endswith('?'):
-                arguments[_v[0:-1]] = None if _k > len(self.arguments) else self.arguments[_k]
-            else:
-                if len(self.arguments) <= _k:
-                    raise InvalidArgument('invalid argument or argument not found: %s.' % _v)
-                arguments[_v] = self.arguments[_k]
+        try:
+            for _k, _v in enumerate(command_arguments):
+                if _v.endswith('?'):
+                    arguments[_v[0:-1]] = None if _k > len(self.arguments) else self.arguments[_k]
+                else:
+                    if len(self.arguments) <= _k:
+                        raise InvalidArgument('invalid argument or argument not found: %s.' % _v)
+                    arguments[_v] = self.arguments[_k]
+        except TypeError:
+            return arguments
 
         self.found['arguments'] = arguments
 

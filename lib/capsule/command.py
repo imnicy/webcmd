@@ -1,11 +1,11 @@
-from importlib import import_module
 from helper import import_module_from_string
 
 
 class Command:
 
     arguments = []
-    _with_init = False
+
+    __with_init__ = False
 
     def __init__(
             self,
@@ -59,7 +59,7 @@ class Command:
             self.aliases = []
 
     def with_init(self, status=True):
-        self._with_init = status
+        self.__with_init__ = status
 
     def run(self):
         the_callable = self.callable
@@ -98,7 +98,7 @@ class Command:
             'caching': self.allow_cache()
         }
 
-        if self._with_init:
+        if self.__with_init__:
             data['init'] = self.init
 
         return data

@@ -91,7 +91,7 @@ app.setLayout = function (name) {
 app.layout = function (name) {
     $scope.ui.addInfo('Searching layout: ' + name);
 
-    if (!window.localStorage['layouts']) {
+    if (! window.localStorage['layouts']) {
         app.layouts(function (data) {
             app.setLayout(name);
         });

@@ -1,4 +1,4 @@
-from .capsule.app import application as cmd_app_capsule
+from lib.capsule.app import application as cmd_app_capsule
 
 
 def boot():
@@ -10,8 +10,4 @@ def register_jwt_authenticate():
 
 
 def register_app_capsule():
-    """
-    register command apps
-    :return: void
-    """
     cmd_app_capsule.register()

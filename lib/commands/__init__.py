@@ -1,8 +1,8 @@
 from flask import g
 from werkzeug.local import LocalProxy
 from providers.validate import Validator
-from ..capsule.exceptions import ValidationError, TerminalException
-from ..capsule.mark import get_mark
+from lib.capsule.exceptions import ValidationError, TerminalException
+from lib.capsule.mark import get_mark
 
 
 def validate(document, scheme=None, messages=None, extra=None):

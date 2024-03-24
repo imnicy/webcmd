@@ -1,9 +1,12 @@
 import os
+
 from logging.config import dictConfig
 
 
-def register(root_path, config):
-    config = config if isinstance(config, dict) else {}
+def register(root_path, config: dict | None):
+    if config is None:
+        config = {}
+
     dictConfig({
         'version': config.get('version', 1),
         'formatters': {
@@ -20,7 +23,7 @@ def register(root_path, config):
             'file': {
                 'class': 'logging.handlers.RotatingFileHandler',
                 'filename': os.path.join(root_path, 'storage/logs/app.log'),
-                'maxBytes': 1024*1024*5,
+                'maxBytes': 1024 * 1024 * 5,
                 'formatter': 'default',
                 'backupCount': 5
             }

@@ -3,7 +3,7 @@ import helper
 from flask import Blueprint, g, json
 from flask_jwt_extended import create_access_token
 from providers.jwt import jwt
-from ..capsule.exceptions import TokenDiscarded, TokenExpired, AppNotFound
+from lib.capsule.exceptions import TokenDiscarded, TokenExpired, AppNotFound
 
 errors_blue = Blueprint('errors', __name__)
 
@@ -30,7 +30,7 @@ def handle_expired_error(e):
         claims = e.get(helper.config('JWT_USER_CLAIMS', {}))
 
         response = TokenExpired('Access token expired.').to_response()
-        response.headers['Authorization'] = create_access_token(identify, user_claims=claims)
+        response.headers['Authorization'] = create_access_token(identify, additional_claims=claims)
 
         query = g.get('query', None)
 

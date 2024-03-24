@@ -3,7 +3,7 @@ from helper import import_module_from_string
 
 
 def process_run():
-    print('process run')
+    pass
 
 
 """
@@ -17,12 +17,6 @@ listeners = {
 
 
 def mark(node, tag):
-    """
-    mark node tag and make signals on make event
-    :param node: str
-    :param tag: str
-    :return: void
-    """
     if node is None or not isinstance(node, str) or tag is None or not isinstance(tag, str):
         """ invalid mark event """
         return
@@ -61,11 +55,6 @@ def mark(node, tag):
 
 
 def get_mark(node):
-    """
-    get mark status on local proxy globals
-    :param node: str
-    :return: str
-    """
     _mark = g.get('mark', {})
 
     return _mark.get(node, None)

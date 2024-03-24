@@ -1,6 +1,6 @@
-from flask import request, make_response, g
 from . import validate, get_query
-from ..models.auth import User, auth_required
+from flask import request, make_response, g
+from lib.models.auth import User, auth_required
 from flask_jwt_extended import create_access_token
 
 """
@@ -39,10 +39,6 @@ def login():
 
 @auth_required
 def logout():
-    """
-    log out
-    :return: dict
-    """
     return {'status': True}
 
 
@@ -89,13 +85,13 @@ def recover():
 @auth_required
 def show():
     document = validate(request, scheme={
-            'username': {
-                'required': True, 'type': 'string', 'regex': '[\w_\-@\.]+', 'min': 3, 'max': 32
-            }
-        }, messages={
-            'username.regex': 'username error.'
-        }, extra=arguments
-    )
+        'username': {
+            'required': True, 'type': 'string', 'regex': '[\w_\-@\.]+', 'min': 3, 'max': 32
+        }
+    }, messages={
+        'username.regex': 'username error.'
+    }, extra=arguments
+                        )
 
     username = document.get('username', None)
     if username is None or not isinstance(username, str):
@@ -126,11 +122,9 @@ def update():
         'password': {'nullable': True, 'type': 'string', 'max': 32, 'min': 6}
     })
 
-    print(document)
     updates = {k.lower(): v.lower() for k, v in document.items() if v is not None and k in [
         'fullname', 'avatar', 'gender', 'webpage', 'github_username', 'tags', 'password'
     ]}
-    print(updates)
 
     user = g.get('user')
     user.update_profile(updates)

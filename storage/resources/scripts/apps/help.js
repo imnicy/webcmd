@@ -14,7 +14,7 @@ app.header = function(pro,callback) {
 
     if(!pro) {
         h.push($scope.ui.dye(' _  _ ___ _    ___   ___  ', 'gr-yellow-2 nobot'));
-        h.push($scope.ui.dye('| || | __| |  | _ \\\\ |__ \\\\ ', 'gr-yellow-3 nobot'));
+        h.push($scope.ui.dye('| || | __| |  | _ \\ |__ \\ ', 'gr-yellow-3 nobot'));
         h.push($scope.ui.dye('| __ | _|| |__|  _/   /_/ ', 'gr-yellow-4 nobot'));
         h.push($scope.ui.dye('|_||_|___|____|_|    (_)  ', 'gr-yellow-5 nobot'));
     } else {

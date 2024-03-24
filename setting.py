@@ -2,13 +2,6 @@ import os
 
 
 def env(name, default=None, force_default=False):
-    """
-    get env config value from environ
-    :param force_default: bool
-    :param name: string
-    :param default: string
-    :return: str
-    """
     value = os.getenv(name, default)
 
     if force_default and (not value or value == '' or value is None):
@@ -18,6 +11,9 @@ def env(name, default=None, force_default=False):
 
 
 class Config:
+
+    def __init__(self):
+        pass
 
     SECRET_KEY = env('SECRET_KEY', 'secret key')
 
@@ -45,8 +41,8 @@ class Config:
             'lib.apps.system.System',
             'lib.apps.user.User'
         ],
-
-        'auth': []
+        'auth': [
+        ]
     }
 
     LOGGER = {
@@ -55,9 +51,9 @@ class Config:
         'handlers': ['wsgi']
     }
 
-    JWT_SECRET_KEY = 'ZVhqY5643bQdrr8d5Bt3'
+    JWT_SECRET_KEY = env('JWT_SECRET_KEY', '')
     JWT_ACCESS_TOKEN_EXPIRES = 20
-    JWT_REFRESH_TOKEN_EXPIRES = 60*60*24*30
+    JWT_REFRESH_TOKEN_EXPIRES = 86400
     JWT_HEADER_NAME = 'Authorization'
     JWT_HEADER_TYPE = 'Bearer'
     JWT_IDENTITY_CLAIM = 'identify'

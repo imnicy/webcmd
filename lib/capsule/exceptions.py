@@ -10,7 +10,6 @@ class TerminalException(Exception):
             'status': False,
             'error_text': str(self)
         }
-
         if self.SCRIPT is not None:
             content['script'] = self.SCRIPT
 

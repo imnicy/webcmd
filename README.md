@@ -24,7 +24,7 @@ $ flask run
 Windows CMD：
 
 ```shell script
-> set FLASK_APP=hello
+> set FLASK_APP=app
 > flask run
 ```
 
@@ -33,6 +33,7 @@ Windows CMD：
 在项目目录下创建 `.env` 文件然后写入：
 
 ```shell script
+PIPENV_VERBOSITY=-1
 FLASK_APP=app
 ```
 

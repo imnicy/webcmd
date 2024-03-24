@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, json
 from flask_wtf import csrf
-from ..capsule.app import application as cmd_app_capsule
-from ..capsule.resource import Resource
+from lib.capsule.app import application as cmd_app_capsule
+from lib.capsule.resource import Resource
 
 
 terminal_blue = Blueprint('terminal', __name__)
